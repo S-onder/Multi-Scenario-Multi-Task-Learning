@@ -10,14 +10,15 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 
-class MMOE(nn.Module):
+class PLE(nn.Module):
     """
     MMOE for CTCVR problem
     """
 
-    def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, n_expert=2, shared_expert = 1,
-                task_hidden_dim=[128, 64], hidden_dim=[128, 64], dropouts=0.5,
-                output_size=1, expert_activation=F.relu, num_task=2, device=None):
+    def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, 
+                task=['ctr', 's5', 's10', 's30', 'follow'], shared_expert=1,
+                hidden_dim=[128, 64], tower_dim = [64, 32], dropouts=0.5,
+                output_size=1, expert_activation=F.relu, device=None):
         """
         MMOE model input parameters
         :param user_feature_dict: user feature dict include: {feature_name: (feature_unique_num, feature_index)}
@@ -29,9 +30,9 @@ class MMOE(nn.Module):
         :param dropouts: task dnn drop out probability
         :param output_size: int task output size
         :param expert_activation: activation function like 'relu' or 'sigmoid'
-        :param num_task: int default 2 multitask numbers
+        :param task: list of task name
         """
-        super(MMOE, self).__init__()
+        super(PLE, self).__init__()
         # check input parameters
         if user_feature_dict is None or item_feature_dict is None:
             raise Exception("input parameter user_feature_dict and item_feature_dict must be not None")
@@ -41,8 +42,10 @@ class MMOE(nn.Module):
         self.user_feature_dict = user_feature_dict
         self.item_feature_dict = item_feature_dict
         self.expert_activation = expert_activation
-        self.num_task = num_task
+        self.num_task = len(task)
         self.shared_expert = shared_expert
+        self.task = task
+        # n_expert = len(task)
 
         if device:
             self.device = device
@@ -64,43 +67,57 @@ class MMOE(nn.Module):
                               len(self.item_feature_dict) - item_cate_feature_nums)
 
         # shared-expert
-        # input_dim = 128
+        # input_dim = embedding_dim
         # output_dim = 64
         for i in range(self.shared_expert):
             setattr(self, 'share_{}_dnn'.format(i+1), nn.ModuleList())
+            share_hidden_dim = [hidden_size] + hidden_dim # embedding_dim -> 128 -> 64
+            for j in range(len(share_hidden_dim)-1):
+                # j= 0,1
+                getattr(self, 'share_{}_dnn'.format(i+1)).add_module('share_hidden_{}'.format(j),
+                                                                    nn.Linear(share_hidden_dim[j], share_hidden_dim[j+1]))
+                getattr(self, 'share_{}_dnn'.format(i+1)).add_module('share_batchnorm_{}'.format(j),
+                                                                    nn.BatchNorm1d(share_hidden_dim[j+1]))
+                getattr(self, 'share_{}_dnn'.format(i+1)).add_module('share_dropout_{}'.format(j),
+                                                                    nn.Dropout(dropouts))
+
+        # task-expert
+        # input_dim = embedding_dim
+        # output_dim = 64
+        for task_name in task:
+            setattr(self, '{}_expert_dnn'.format(task_name), nn.ModuleList())
+            task_hidden_dim = [hidden_size] + hidden_dim #embedding_dim,128,64
             for j in range(len(task_hidden_dim)-1):
-                getattr(self, 'share_{}_dnn'.format(i+1)).add_module('shared_hidden_{}'.format(j),
-                                                                    nn.Linear(task_hidden_dim[j], task_hidden_dim[j+1]))
-                getattr(self, 'share_{}_dnn'.format(i+1)).add_module('shared_batchnorm_{}'.format(j),
-                                                                    nn.BatchNorm1d(task_hidden_dim[j+1]))
-                getattr(self, 'share_{}_dnn')
+                getattr(self, '{}_expert_dnn'.format(task_name)).add_module('{}_expert_hidden_{}'.format(task_name, j),
+                                                                            nn.Linear(task_hidden_dim[j], task_hidden_dim[j+1]))
+                getattr(self, '{}_expert_dnn'.format(task_name)).add_module('{}_expert_batchnorm_{}'.format(task_name, j),
+                                                                            nn.BatchNorm1d(task_hidden_dim[j+1]))
+                getattr(self, '{}_expert_dnn'.format(task_name)).add_module('{}_expert_dropout_{}'.format(task_name, j),
+                                                                            nn.Dropout(dropouts))
 
-
-
-
-        # experts
-        self.experts = torch.nn.Parameter(torch.rand(hidden_size, mmoe_hidden_dim, n_expert), requires_grad=True)
-        self.experts.data.normal_(0, 1)
-        self.experts_bias = torch.nn.Parameter(torch.rand(mmoe_hidden_dim, n_expert), requires_grad=True)
+            
         # gates
-        self.gates = [torch.nn.Parameter(torch.rand(hidden_size, n_expert), requires_grad=True) for _ in
-                      range(num_task)]
+        self.gates = [torch.nn.Parameter(torch.rand(hidden_size, shared_expert+1), requires_grad=True) for _ in
+                      range(num_task)] # gate 形状是[-1,2,64]
         for gate in self.gates:
             gate.data.normal_(0, 1)
-        self.gates_bias = [torch.nn.Parameter(torch.rand(n_expert), requires_grad=True) for _ in range(num_task)]
+        self.gates_bias = [torch.nn.Parameter(torch.rand(shared_expert+1), requires_grad=True) for _ in range(num_task)]
 
-        for i in range(self.num_task):
-            setattr(self, 'task_{}_dnn'.format(i + 1), nn.ModuleList())
-            hid_dim = [mmoe_hidden_dim] + hidden_dim
-            for j in range(len(hid_dim) - 1):
-                getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('ctr_hidden_{}'.format(j),
-                                                                      nn.Linear(hid_dim[j], hid_dim[j + 1]))
-                getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('ctr_batchnorm_{}'.format(j),
-                                                                      nn.BatchNorm1d(hid_dim[j + 1]))
-                getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('ctr_dropout_{}'.format(j),
-                                                                      nn.Dropout(dropouts[j]))
-            getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('task_last_layer',
-                                                                  nn.Linear(hid_dim[-1], output_size))
+
+        # tower
+        for task_name in task:
+            setattr(self, '{}_tower_dnn'.format(task_name), nn.ModuleList())
+            tower_hidden_dim = tower_dim #embedding_dim,128,64
+            for j in range(len(tower_hidden_dim)-1):
+                getattr(self, '{}_tower_dnn'.format(task_name)).add_module('{}_tower_hidden_{}'.format(task_name, j),
+                                                                            nn.Linear(tower_hidden_dim[j], tower_hidden_dim[j+1]))
+                getattr(self, '{}_tower_dnn'.format(task_name)).add_module('{}_tower_batchnorm_{}'.format(task_name, j),
+                                                                            nn.BatchNorm1d(tower_hidden_dim[j+1]))
+                getattr(self, '{}_tower_dnn'.format(task_name)).add_module('{}_tower_dropout_{}'.format(task_name, j),
+                                                                            nn.Dropout(dropouts))
+            getattr(self,'{}_tower_dnn'.format(task_name)).add_module('{}_tower_laset_layer'.format(task_name),
+                                                                            nn.Linear(tower_hidden_dim[-1], output_size))
+
 
     def forward(self, x):
         assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
@@ -124,12 +141,23 @@ class MMOE(nn.Module):
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size
 
-        # mmoe
-        experts_out = torch.einsum('ij, jkl -> ikl', hidden, self.experts)  # batch * mmoe_hidden_size * num_experts
-        experts_out += self.experts_bias
-        if self.expert_activation is not None:
-            experts_out = self.expert_activation(experts_out)
+        # shared-expert
+        share_experts = list()
+        for i in range(self.shared_expert):
+            share_expert = hidden
+            for share in getattr(self, 'share_{}_dnn'.format(i+1))
+                share_expert = share(share_expert)
+            share_experts.append(share_expert)
 
+        # task-expert
+        task_experts = list()
+        for task_name in self.task:
+            task_expert = hidden
+            for task_nn in getattr(self, '{}_expert_dnn'.format(task_name)):
+                task_expert = task_nn(task_expert)
+            task_experts.append(task_expert)
+
+        # gate
         gates_out = list()
         for idx, gate in enumerate(self.gates):
             gate = gate.to(self.device)
@@ -140,21 +168,20 @@ class MMOE(nn.Module):
             gate_out = nn.Softmax(dim=-1)(gate_out)
             gates_out.append(gate_out)
 
-        outs = list()
-        for gate_output in gates_out:
-            expanded_gate_output = torch.unsqueeze(gate_output, 1)  # batch * 1 * num_experts
-            weighted_expert_output = experts_out * expanded_gate_output.expand_as(
-                experts_out)  # batch * mmoe_hidden_size * num_experts
-            outs.append(torch.sum(weighted_expert_output, 2))  # batch * mmoe_hidden_size
+        # 加权
+        all_cgc = list()
+        for i, task_name in enumerate(task):
+            combined_expert_outputs = torch.cat(share_experts[0]+task_experts[i], dim=-1)
+            task_out = torch.sum(gates_out[i].unsqueeze(-1)*combined_expert_outputs, dim=0)
+            all_cgc.append(task_out)
 
         # task tower
         task_outputs = list()
-        for i in range(self.num_task):
-            x = outs[i]
-            for mod in getattr(self, 'task_{}_dnn'.format(i + 1)):
+        for i, task_name in enumerate(task):
+            x = all_cgc[i]
+            for mod in getattr(self, '{}_tower_dnn'.format(task_name)):
                 x = mod(x)
             task_outputs.append(x)
-
         return task_outputs
 
 
