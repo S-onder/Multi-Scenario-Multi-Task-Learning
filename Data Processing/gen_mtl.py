@@ -11,6 +11,66 @@ path = '/data/QK-article.csv'
 
 workspace = '/data/mtl_task_article'
 
+def split_large_csv(path, workspace, user_id_limit=1000017, rows_per_file=1000000):
+    """
+    分割大CSV文件到多个小文件。
+    
+    参数:
+        path (str): 源CSV文件路径。
+        workspace (str): 分割后的文件存储路径。
+        user_id_limit (int): 处理用户ID小于该值的行。
+        rows_per_file (int): 每个子文件包含的最大行数。
+    """
+    # 创建目标目录
+    os.makedirs(workspace, exist_ok=True)
+    
+    # 初始化变量
+    file_index = 0  # 子文件编号
+    row_count = 0   # 当前子文件的行数
+    csvwriter = None  # 当前文件的写入器
+    current_file = None  # 当前文件对象
+    
+    with open(path, 'r', newline='') as file:
+        csvreader = csv.reader(file)
+        header = next(csvreader)  # 读取表头
+        
+        for row in csvreader:
+            # 筛选 user_id
+            user_id = int(row[0])
+            if user_id >= user_id_limit:
+                continue
+            
+            # 如果需要创建新文件
+            if row_count == 0 or row_count >= rows_per_file:
+                # 如果有打开的文件，先关闭
+                if current_file:
+                    current_file.close()
+                
+                # 更新文件索引和路径
+                file_index += 1
+                new_file_path = os.path.join(workspace, f'QK_article_part_{file_index}.csv')
+                
+                # 创建新文件并写入表头
+                current_file = open(new_file_path, 'w', newline='')
+                csvwriter = csv.writer(current_file)
+                csvwriter.writerow(header)  # 写入表头
+                row_count = 0  # 重置行计数
+            
+            # 写入数据
+            csvwriter.writerow(row)
+            row_count += 1
+    
+    # 最后关闭文件
+    if current_file:
+        current_file.close()
+    
+    print(f"分割完成，共生成 {file_index} 个子文件。")
+
+if __name__ == '__main__':
+    workspace = '/data/mtl_task_article'
+    path = '/data/QK-article.csv'
+    split_large_csv(path,workspace)
+
 with open(path, 'r', newline='') as file:
     csvreader = csv.reader(file)
     a = next(csvreader)
