@@ -26,11 +26,18 @@ def select_sampler(train_data, val_data, test_data, user_count, item_count, args
 def mtl_data(path=None, args=None):
     if not path:
         return
-    df = pd.read_csv(path, usecols=["user_id", "item_id", "click", "like", "video_category", "gender", "age", "hist_1", "hist_2",
-                       "hist_3", "hist_4", "hist_5", "hist_6", "hist_7", "hist_8", "hist_9", "hist_10"])
+    df = pd.read_csv(path, usecols=['user_id', 'video_id', 'is_click', 'is_like', 'is_follow', 'tab',
+                                    'is_5s', 'is_10s', 'is_18s', 'follow_user_num_range',
+                                    'fans_user_num_range', 'friend_user_num_range', 'author_id',
+                                    'video_type', 'music_type', 'show_user_num', 'play_user_num',
+                                    'complete_play_user_num', 'valid_play_user_num'])
     # df = df[:100000]
-    df['video_category'] = df['video_category'].astype(str)
-    df = sample_data(df)
+    # df['video_category'] = df['video_category'].astype(str)
+    df['follow_user_num_range'] = df['follow_user_num_range'].astype(str)
+    df['fans_user_num_range'] = df['fans_user_num_range'].astype(str)
+    df['friend_user_num_range'] = df['friend_user_num_range'].astype(str)
+    df['video_type'] = df['video_type'].astype(str)
+    # df = sample_data(df)
     if args.mtl_task_num == 2:
         label_columns = ['click', 'like']
         categorical_columns = ["user_id", "item_id", "video_category", "gender", "age", "hist_1", "hist_2",
@@ -40,14 +47,20 @@ def mtl_data(path=None, args=None):
         categorical_columns = ["user_id", "item_id", "video_category", "gender", "age", "hist_1", "hist_2",
                                "hist_3", "hist_4", "hist_5", "hist_6", "hist_7", "hist_8", "hist_9", "hist_10"]
     else:
-        label_columns = ['like']
-        categorical_columns = ["user_id", "item_id", "video_category", "gender", "age", "hist_1", "hist_2",
-                               "hist_3", "hist_4", "hist_5", "hist_6", "hist_7", "hist_8", "hist_9", "hist_10"]
-    user_columns = ["user_id", "gender", "age"]
+        label_columns = ['is_click', 'is_like', 'is_follow','is_5s', 'is_10s', 'is_18s']
+        categorical_columns = ['user_id', 'video_id', 'follow_user_num_range','tab',
+                                    'fans_user_num_range', 'friend_user_num_range', 'author_id',
+                                    'video_type', 'music_type', 'show_user_num', 'play_user_num',
+                                    'complete_play_user_num', 'valid_play_user_num']
+    user_columns = ['user_id', 'video_id', 'author_id','tab']
+    digit_columns = ['show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num']
+    print(f'digit_columns: {digit_columns} to index')
+    for col in tqdm(digit_columns):
+        df[col] = pd.qcut(df[col], q=5, labels=[1,2,3,4,5])
+    print(f'categorical_columns: {categorical_columns} to index')
     for col in tqdm(categorical_columns):
         le = LabelEncoder()
         df[col] = le.fit_transform(df[col])
-
     new_columns = categorical_columns + label_columns
     df = df.reindex(columns=new_columns)
 
@@ -59,7 +72,7 @@ def mtl_data(path=None, args=None):
             else:
                 item_feature_dict[col] = (len(df[col].unique()), idx)
 
-    df = df.sample(frac=1)
+    df = df.sample(frac=1) #打乱数据
     train_len = int(len(df) * 0.8)
     train_df = df[:train_len]
     tmp_df = df[train_len:]
@@ -831,6 +844,13 @@ class mtlDataSet(data_utils.Dataset):
         if args.mtl_task_num == 2:
             self.label1 = data[1]
             self.label2 = data[2]
+        elif args.mtl_task_num == 6:
+            self.label1 = data[1]
+            self.label2 = data[2]
+            self.label3 = data[3]
+            self.label4 = data[4]
+            self.label5 = data[5]
+            self.label6 = data[6]
         else:
             self.label = data[1]
 
@@ -840,6 +860,14 @@ class mtlDataSet(data_utils.Dataset):
             label1 = self.label1[index]
             label2 = self.label2[index]
             return feature, label1, label2
+        elif self.args.mtl_task_num == 6:
+            label1 = self.label1[index]
+            label2 = self.label2[index]
+            label3 = self.label3[index]
+            label4 = self.label4[index]
+            label5 = self.label5[index]
+            label6 = self.label6[index]
+            return feature, label1, label2, label3, label4, label5, label6
         else:
             label = self.label[index]
             return feature, label

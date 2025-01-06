@@ -16,7 +16,7 @@ class PLE(nn.Module):
     """
 
     def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, 
-                task=['ctr', 's5', 's10', 's30', 'follow'], shared_expert=1,
+                task=['ctr', 's5', 's10', 's18', 'follow', 'like'], shared_expert=1,
                 hidden_dim=[128, 64], tower_dim = [64, 32], dropouts=0.5,
                 output_size=1, expert_activation=F.relu, device=None):
         """
@@ -98,10 +98,10 @@ class PLE(nn.Module):
             
         # gates
         self.gates = [torch.nn.Parameter(torch.rand(hidden_size, shared_expert+1), requires_grad=True) for _ in
-                      range(num_task)] # gate 形状是[-1,2,64]
+                      range(self.num_task)] # gate 形状是[-1,2,64]
         for gate in self.gates:
             gate.data.normal_(0, 1)
-        self.gates_bias = [torch.nn.Parameter(torch.rand(shared_expert+1), requires_grad=True) for _ in range(num_task)]
+        self.gates_bias = [torch.nn.Parameter(torch.rand(shared_expert+1), requires_grad=True) for _ in range(self.num_task)]
 
 
         # tower
@@ -140,12 +140,12 @@ class PLE(nn.Module):
 
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size
-
+        
         # shared-expert
         share_experts = list()
         for i in range(self.shared_expert):
             share_expert = hidden
-            for share in getattr(self, 'share_{}_dnn'.format(i+1))
+            for share in getattr(self, 'share_{}_dnn'.format(i+1)):
                 share_expert = share(share_expert)
             share_experts.append(share_expert)
 
@@ -170,14 +170,17 @@ class PLE(nn.Module):
 
         # 加权
         all_cgc = list()
-        for i, task_name in enumerate(task):
-            combined_expert_outputs = torch.cat(share_experts[0]+task_experts[i], dim=-1)
-            task_out = torch.sum(gates_out[i].unsqueeze(-1)*combined_expert_outputs, dim=0)
+        for i, task_name in enumerate(self.task):
+            task_expert = torch.unsqueeze(task_experts[i], 1) # batch * 1 * num_experts
+            share_expert = torch.unsqueeze(share_experts[0], 1) # batch * 1 * num_experts
+            combined_expert_outputs = torch.cat((share_expert,task_expert), dim=1)
+            weighted = gates_out[0].unsqueeze(-1) * combined_expert_outputs
+            task_out = torch.sum(weighted, dim=1)
             all_cgc.append(task_out)
 
         # task tower
         task_outputs = list()
-        for i, task_name in enumerate(task):
+        for i, task_name in enumerate(self.task):
             x = all_cgc[i]
             for mod in getattr(self, '{}_tower_dnn'.format(task_name)):
                 x = mod(x)

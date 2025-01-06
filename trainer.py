@@ -113,6 +113,157 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
         print("Epoch %d test loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1,
                                                                                      total_test_loss / count_eval,
                                                                                      click_auc, like_auc))
+    elif args.mtl_task_num == 6:
+        model.train()
+        for i in range(epoch):
+            y_train_click_true = []
+            y_train_click_predict = []
+            y_train_like_true = []
+            y_train_like_predict = []
+            y_train_follow_true = []
+            y_train_follow_predict = []
+            y_train_5s_true = []
+            y_train_5s_predict = []
+            y_train_10s_true = []
+            y_train_10s_predict = []
+            y_train_18s_true = []
+            y_train_18s_predict = []
+            total_loss, count = 0, 0
+            for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(train_loader):
+                # ['is_click', 'is_like', 'is_follow','is_5s', 'is_10s', 'is_18s']
+                x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
+                predict = model(x)
+                # 真实值
+                y_train_click_true += list(y1.squeeze().cpu().numpy())
+                y_train_like_true += list(y2.squeeze().cpu().numpy())
+                y_train_follow_true += list(y3.squeeze().cpu().numpy())
+                y_train_5s_true += list(y4.squeeze().cpu().numpy())
+                y_train_10s_true += list(y5.squeeze().cpu().numpy())
+                y_train_18s_true += list(y6.squeeze().cpu().numpy())
+                # 预测值
+                y_train_click_predict += list(predict[0].squeeze().cpu().detach().numpy())
+                y_train_like_predict += list(predict[1].squeeze().cpu().detach().numpy())
+                y_train_follow_predict += list(predict[2].squeeze().cpu().detach().numpy())
+                y_train_5s_predict += list(predict[3].squeeze().cpu().detach().numpy())
+                y_train_10s_predict += list(predict[4].squeeze().cpu().detach().numpy())
+                y_train_18s_predict += list(predict[5].squeeze().cpu().detach().numpy())
+                loss_1 = loss_function(predict[0], y1.unsqueeze(1).float())
+                loss_2 = loss_function(predict[1], y2.unsqueeze(1).float())
+                loss_3 = loss_function(predict[2], y3.unsqueeze(1).float())
+                loss_4 = loss_function(predict[3], y4.unsqueeze(1).float())
+                loss_5 = loss_function(predict[4], y5.unsqueeze(1).float())
+                loss_6 = loss_function(predict[5], y6.unsqueeze(1).float())
+                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+                total_loss += float(loss)
+                count += 1
+            click_auc = roc_auc_score(y_train_click_true, y_train_click_predict)
+            like_auc = roc_auc_score(y_train_like_true, y_train_like_predict)
+            follow_auc = roc_auc_score(y_train_follow_true, y_train_follow_predict)
+            s5_auc = roc_auc_score(y_train_5s_true, y_train_5s_predict)
+            s10_auc = roc_auc_score(y_train_10s_true, y_train_10s_predict)
+            s18_auc = roc_auc_score(y_train_18s_true, y_train_18s_predict)
+            print("Epoch %d train loss is %.3f, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count,
+                                                                                             click_auc, like_auc,
+                                                                                             follow_auc, s5_auc, s10_auc,
+                                                                                             s18_auc))
+            # 验证
+            total_eval_loss = 0
+            model.eval()
+            count_eval = 0
+            y_val_click_true = []
+            y_val_like_true = []
+            y_val_click_predict = []
+            y_val_like_predict = []
+            y_val_follow_true = []
+            y_val_follow_predict = []
+            y_val_5s_true = []
+            y_val_5s_predict = []
+            y_val_10s_true = []
+            y_val_10s_predict = []
+            y_val_18s_true = []
+            y_val_18s_predict = []
+            for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(val_loader):
+                x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
+                predict = model(x)
+                # 真实值
+                y_val_click_true += list(y1.squeeze().cpu().numpy())
+                y_val_like_true += list(y2.squeeze().cpu().numpy())
+                y_val_follow_true += list(y3.squeeze().cpu().numpy())
+                y_val_5s_true += list(y4.squeeze().cpu().numpy())
+                y_val_10s_true += list(y5.squeeze().cpu().numpy())
+                y_val_18s_true += list(y6.squeeze().cpu().numpy())
+                # 预测值
+                y_val_click_predict += list(predict[0].squeeze().cpu().detach().numpy())
+                y_val_like_predict += list(predict[1].squeeze().cpu().detach().numpy())
+                y_val_follow_predict += list(predict[2].squeeze().cpu().detach().numpy())
+                y_val_5s_predict += list(predict[3].squeeze().cpu().detach().numpy())
+                y_val_10s_predict += list(predict[4].squeeze().cpu().detach().numpy())
+                y_val_18s_predict += list(predict[5].squeeze().cpu().detach().numpy())
+
+                # loss
+                loss_1 = loss_function(predict[0], y1.unsqueeze(1).float())
+                loss_2 = loss_function(predict[1], y2.unsqueeze(1).float())
+                loss_3 = loss_function(predict[2], y3.unsqueeze(1).float())
+                loss_4 = loss_function(predict[3], y4.unsqueeze(1).float())
+                loss_5 = loss_function(predict[4], y5.unsqueeze(1).float())
+                loss_6 = loss_function(predict[5], y6.unsqueeze(1).float())
+                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
+                total_eval_loss += float(loss)
+                count_eval += 1
+            click_auc = roc_auc_score(y_val_click_true, y_val_click_predict)
+            like_auc = roc_auc_score(y_val_like_true, y_val_like_predict)
+            follow_auc = roc_auc_score(y_val_follow_true, y_val_follow_predict)
+            s5_auc = roc_auc_score(y_val_5s_true, y_val_5s_predict)
+            s10_auc = roc_auc_score(y_val_10s_true, y_val_10s_predict)
+            s18_auc = roc_auc_score(y_val_18s_true, y_val_18s_predict)
+            print("Epoch %d val loss is %.3f, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1,
+                                                                                        total_eval_loss / count_eval,
+                                                                                        click_auc, like_auc, follow_auc, s5_auc, s10_auc, s18_auc))
+
+            # earl stopping
+            if i == 0:
+                eval_loss = total_eval_loss / count_eval
+            else:
+                if total_eval_loss / count_eval < eval_loss:
+                    eval_loss = total_eval_loss / count_eval
+                    state = model.state_dict()
+                    torch.save(state, path)
+                else:
+                    if patience < early_stop:
+                        patience += 1
+                    else:
+                        print("val loss is not decrease in %d epoch and break training" % patience)
+                        break
+        #test
+        # state = torch.load(path)
+        # model.load_state_dict(state)
+        # total_test_loss = 0
+        # model.eval()
+        # count_eval = 0
+        # y_test_click_true = []
+        # y_test_like_true = []
+        # y_test_click_predict = []
+        # y_test_like_predict = []
+        # for idx, (x, y1, y2) in enumerate(test_loader):
+        #     x, y1, y2 = x.to(device), y1.to(device), y2.to(device)
+        #     predict = model(x)
+        #     y_test_click_true += list(y1.squeeze().cpu().numpy())
+        #     y_test_like_true += list(y2.squeeze().cpu().numpy())
+        #     y_test_click_predict += list(predict[0].squeeze().cpu().detach().numpy())
+        #     y_test_like_predict += list(predict[1].squeeze().cpu().detach().numpy())
+        #     loss_1 = loss_function(predict[0], y1.unsqueeze(1).float())
+        #     loss_2 = loss_function(predict[1], y2.unsqueeze(1).float())
+        #     loss = loss_1 + loss_2
+        #     total_test_loss += float(loss)
+        #     count_eval += 1
+        # click_auc = roc_auc_score(y_test_click_true, y_test_click_predict)
+        # like_auc = roc_auc_score(y_test_like_true, y_test_like_predict)
+        # print("Epoch %d test loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1,
+        #                                                                              total_test_loss / count_eval,
+        #                                                                              click_auc, like_auc))
 
     else:
         if train:

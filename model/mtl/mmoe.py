@@ -106,7 +106,7 @@ class MMOE(nn.Module):
 
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size
-
+        # print(f'input embedding dim : {hidden.size()}')
         # mmoe
         experts_out = torch.einsum('ij, jkl -> ikl', hidden, self.experts)  # batch * mmoe_hidden_size * num_experts
         experts_out += self.experts_bias
