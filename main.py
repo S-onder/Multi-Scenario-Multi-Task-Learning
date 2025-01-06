@@ -9,41 +9,42 @@ from load_model import *
 from splitter import *
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import train_test_split
-from model.sequence_model.bert4rec import BERTModel
-from model.sequence_model.sasrec import SASRec
-from model.sequence_model.nextitnet import NextItNet
-from model.sequence_model.gru4rec import GRU4Rec
-from model.ctr.deepfm import DeepFM
-from model.ctr.xdeepfm import xDeepFM
-from model.ctr.nfm import NFM
-from model.ctr.wdl import WDL
-from model.ctr.afm import AFM
-from model.ctr.dcn import DCN
-from model.ctr.dcnmix import DCNMix
-from model.ctr.dien import DIEN
-from model.ctr.din import DIN
-from model.transfer_learning.peterrec import PeterRec
+# from model.sequence_model.bert4rec import BERTModel
+# from model.sequence_model.sasrec import SASRec
+# from model.sequence_model.nextitnet import NextItNet
+# from model.sequence_model.gru4rec import GRU4Rec
+# from model.ctr.deepfm import DeepFM
+# from model.ctr.xdeepfm import xDeepFM
+# from model.ctr.nfm import NFM
+# from model.ctr.wdl import WDL
+# from model.ctr.afm import AFM
+# from model.ctr.dcn import DCN
+# from model.ctr.dcnmix import DCNMix
+# from model.ctr.dien import DIEN
+# from model.ctr.din import DIN
+# from model.transfer_learning.peterrec import PeterRec
 from model.mtl.esmm import ESMM
 from model.mtl.mmoe import MMOE
-from model.model_accelerate.stackrec import StackRec
-from model.model_compression.cprec import CpRec
-from model.inference_acceleration.skiprec import SkipRec, PolicyNetGumbel
-from model.inference_acceleration.sas4infacc import SAS4infaccModel, SAS_PolicyNetGumbel
-from model.transfer_learning.sas4transfer import SAS_TransferModel
-from model.user_profile_representation.bert4profile import BERT_ProfileModel
-from model.user_profile_representation.peter4profile import Peter_ProfileModel
-from model.user_profile_representation.dnn4profile import DNNModel
-from model.life_long.conure import Conure
-from model.life_long.bert4life import BERT4Life
-from model.life_long.sas4life import SAS4Life
-from model.coldstart.bert4coldstart import BERT_ColdstartModel
-from model.coldstart.peter4coldstart import Peter4Coldstart
-from model.model_accelerate.sas4acc import SAS4accModel
-from model.model_compression.sas4cp import SAS4cpModel
-from model.cf.ncf import NCF
-from model.cf.mf import MF
-from model.cf.lightgcn import LightGCN
-from model.cf.ngcf import NGCF
+from model.mtl.ple import PLE
+# from model.model_accelerate.stackrec import StackRec
+# from model.model_compression.cprec import CpRec
+# from model.inference_acceleration.skiprec import SkipRec, PolicyNetGumbel
+# from model.inference_acceleration.sas4infacc import SAS4infaccModel, SAS_PolicyNetGumbel
+# from model.transfer_learning.sas4transfer import SAS_TransferModel
+# from model.user_profile_representation.bert4profile import BERT_ProfileModel
+# from model.user_profile_representation.peter4profile import Peter_ProfileModel
+# from model.user_profile_representation.dnn4profile import DNNModel
+# from model.life_long.conure import Conure
+# from model.life_long.bert4life import BERT4Life
+# from model.life_long.sas4life import SAS4Life
+# from model.coldstart.bert4coldstart import BERT_ColdstartModel
+# from model.coldstart.peter4coldstart import Peter4Coldstart
+# from model.model_accelerate.sas4acc import SAS4accModel
+# from model.model_compression.sas4cp import SAS4cpModel
+# from model.cf.ncf import NCF
+# from model.cf.mf import MF
+# from model.cf.lightgcn import LightGCN
+# from model.cf.ngcf import NGCF
 # from model.cf.vae import VAECF
 # from model.cf.item2vec import Item2Vec
 
@@ -234,6 +235,19 @@ def get_data(args):
             train_dataset = (train_data.iloc[:, :-2].values, train_data.iloc[:, -2].values, train_data.iloc[:, -1].values)
             val_dataset = (val_data.iloc[:, :-2].values, val_data.iloc[:, -2].values, val_data.iloc[:, -1].values)
             test_dataset = (test_data.iloc[:, :-2].values, test_data.iloc[:, -2].values, test_data.iloc[:, -1].values)
+        elif args.mtl_task_num == 6:
+            train_dataset = (train_data.iloc[:, :-6].values, train_data.iloc[:, -6].values, 
+                             train_data.iloc[:, -5].values, train_data.iloc[:, -4].values, 
+                             train_data.iloc[:, -3].values, train_data.iloc[:, -2].values, 
+                             train_data.iloc[:, -1].values)
+            val_dataset = (val_data.iloc[:, :-6].values, val_data.iloc[:, -6].values, 
+                            val_data.iloc[:, -5].values,val_data.iloc[:, -4].values,
+                            val_data.iloc[:, -3].values,val_data.iloc[:, -2].values,
+                            val_data.iloc[:, -1].values,)
+            test_dataset = (test_data.iloc[:, :-6].values, test_data.iloc[:, -6].values,
+                            test_data.iloc[:, -5].values,test_data.iloc[:, -4].values,
+                            test_data.iloc[:, -3].values,test_data.iloc[:, -2].values,
+                            test_data.iloc[:, -1].values)
         else:
             train_dataset = (train_data.iloc[:, :-1].values, train_data.iloc[:, -1].values)
             val_dataset = (val_data.iloc[:, :-1].values, val_data.iloc[:, -1].values)
@@ -368,7 +382,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--lr', type=float, default=0.0005)
 
-    parser.add_argument('--device', default='cuda')  # cuda:0
+    parser.add_argument('--device', default='cpu')  # cuda:0
     parser.add_argument('--is_parallel', type=bool, default=False)
     parser.add_argument('--local_rank', type=int)
     parser.add_argument('--num_gpu', type=int, default=1)
@@ -516,12 +530,16 @@ if __name__ == "__main__":
         train_dataloader, val_dataloader, test_dataloader, user_feature_dict, item_feature_dict = get_data(args)
         if args.mtl_task_num == 2:
             num_task = 2
+        elif args.mtl_task_num == 6:
+            num_task = 6
         else:
             num_task = 1
         if args.model_name == 'esmm':
             model = ESMM(user_feature_dict, item_feature_dict, emb_dim=args.embedding_size, num_task=num_task)
-        else:
+        elif args.model_name == 'mmoe':
             model = MMOE(user_feature_dict, item_feature_dict, emb_dim=args.embedding_size, device=args.device, num_task=num_task)
+        else:
+            model = PLE(user_feature_dict, item_feature_dict,device=args.device)
         mtlTrain(model, train_dataloader, val_dataloader, test_dataloader, args, train=False)
     elif args.task_name == 'transfer_learning':
         print('=============transfer_learning=============')
