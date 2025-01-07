@@ -223,20 +223,20 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                                                                                         total_eval_loss / count_eval,
                                                                                         click_auc, like_auc, follow_auc, s5_auc, s10_auc, s18_auc))
 
-            # earl stopping
-            if i == 0:
-                eval_loss = total_eval_loss / count_eval
-            else:
-                if total_eval_loss / count_eval < eval_loss:
-                    eval_loss = total_eval_loss / count_eval
-                    state = model.state_dict()
-                    torch.save(state, path)
-                else:
-                    if patience < early_stop:
-                        patience += 1
-                    else:
-                        print("val loss is not decrease in %d epoch and break training" % patience)
-                        break
+#            # earl stopping
+#            if i == 0:
+#                eval_loss = total_eval_loss / count_eval
+#            else:
+#                if total_eval_loss / count_eval < eval_loss:
+#                    eval_loss = total_eval_loss / count_eval
+#                    state = model.state_dict()
+#                    torch.save(state, path)
+#                else:
+#                    if patience < early_stop:
+#                        patience += 1
+#                    else:
+#                        print("val loss is not decrease in %d epoch and break training" % patience)
+#                        break
         #test
         # state = torch.load(path)
         # model.load_state_dict(state)
