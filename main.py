@@ -26,6 +26,8 @@ from sklearn.model_selection import train_test_split
 from model.mtl.esmm import ESMM
 from model.mtl.mmoe import MMOE
 from model.mtl.ple import PLE
+from model.mtl.pepnet import PEPNet
+from model.mtl.hinet import HiNet
 # from model.model_accelerate.stackrec import StackRec
 # from model.model_compression.cprec import CpRec
 # from model.inference_acceleration.skiprec import SkipRec, PolicyNetGumbel
@@ -538,8 +540,14 @@ if __name__ == "__main__":
             model = ESMM(user_feature_dict, item_feature_dict, emb_dim=args.embedding_size, num_task=num_task)
         elif args.model_name == 'mmoe':
             model = MMOE(user_feature_dict, item_feature_dict, emb_dim=args.embedding_size, device=args.device, num_task=num_task)
-        else:
+        elif args.model_name == 'pepnet':
+            model = PEPNet(user_feature_dict, item_feature_dict,device=args.device)
+        elif args.model_name == 'ple':
             model = PLE(user_feature_dict, item_feature_dict,device=args.device)
+        elif args.model_name == 'hinet':
+            model = HiNet(user_feature_dict, item_feature_dict,device=args.device)
+        else:
+            raise NotImplementedError
         mtlTrain(model, train_dataloader, val_dataloader, test_dataloader, args, train=False)
     elif args.task_name == 'transfer_learning':
         print('=============transfer_learning=============')

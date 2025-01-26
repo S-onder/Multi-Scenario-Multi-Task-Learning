@@ -7,6 +7,7 @@ import torch.nn.utils.prune as prune
 import torch.nn.functional as F
 from sklearn.metrics import roc_auc_score
 from metrics import *
+from utils import scene_auc
 
 def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
     device = args.device
@@ -132,7 +133,8 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(train_loader):
                 # ['is_click', 'is_like', 'is_follow','is_5s', 'is_10s', 'is_18s']
                 x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
-                predict = model(x)
+                predict, _ = model(x)
+
                 # 真实值
                 y_train_click_true += list(y1.squeeze().cpu().numpy())
                 y_train_like_true += list(y2.squeeze().cpu().numpy())
@@ -159,16 +161,17 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 optimizer.step()
                 total_loss += float(loss)
                 count += 1
+            # 总场景
             click_auc = roc_auc_score(y_train_click_true, y_train_click_predict)
             like_auc = roc_auc_score(y_train_like_true, y_train_like_predict)
             follow_auc = roc_auc_score(y_train_follow_true, y_train_follow_predict)
             s5_auc = roc_auc_score(y_train_5s_true, y_train_5s_predict)
             s10_auc = roc_auc_score(y_train_10s_true, y_train_10s_predict)
             s18_auc = roc_auc_score(y_train_18s_true, y_train_18s_predict)
-            print("Epoch %d train loss is %.3f, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count,
-                                                                                             click_auc, like_auc,
-                                                                                             follow_auc, s5_auc, s10_auc,
-                                                                                             s18_auc))
+            print("Epoch %d train loss is %.3f, total scene, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, 
+                                                        total_loss / count, 
+                                                       click_auc, like_auc,follow_auc, s5_auc, s10_auc, s18_auc))
+            
             # 验证
             total_eval_loss = 0
             model.eval()
@@ -185,9 +188,12 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             y_val_10s_predict = []
             y_val_18s_true = []
             y_val_18s_predict = []
+            scene = []
             for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(val_loader):
                 x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
-                predict = model(x)
+                predict, scene_feature = model(x)
+                #场景特征
+                scene += list(scene_feature.squeeze().cpu().numpy())
                 # 真实值
                 y_val_click_true += list(y1.squeeze().cpu().numpy())
                 y_val_like_true += list(y2.squeeze().cpu().numpy())
@@ -213,15 +219,62 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
                 total_eval_loss += float(loss)
                 count_eval += 1
-            click_auc = roc_auc_score(y_val_click_true, y_val_click_predict)
+
+            scene = np.array(scene)
+            click_predict, click_true = np.array(y_val_click_predict), np.array(y_val_click_true)
+            like_predict, like_true = np.array(y_val_like_predict), np.array(y_val_like_true)
+            follow_predict, follow_true = np.array(y_val_follow_predict), np.array(y_val_follow_true)
+            s5_predict, s5_true = np.array(y_val_5s_predict), np.array(y_val_5s_true)
+            s10_predict, s10_true = np.array(y_val_10s_predict), np.array(y_val_10s_true)
+            s18_predict, s18_true = np.array(y_val_18s_predict), np.array(y_val_18s_true)
+
+            # 总场景
+            click_auc = roc_auc_score(click_true, click_predict)
             like_auc = roc_auc_score(y_val_like_true, y_val_like_predict)
             follow_auc = roc_auc_score(y_val_follow_true, y_val_follow_predict)
             s5_auc = roc_auc_score(y_val_5s_true, y_val_5s_predict)
             s10_auc = roc_auc_score(y_val_10s_true, y_val_10s_predict)
             s18_auc = roc_auc_score(y_val_18s_true, y_val_18s_predict)
-            print("Epoch %d val loss is %.3f, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1,
+            print("Epoch %d val loss is %.3f, total scene, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1,
                                                                                         total_eval_loss / count_eval,
                                                                                         click_auc, like_auc, follow_auc, s5_auc, s10_auc, s18_auc))
+            # 场景1:
+            click_auc_1 = scene_auc(click_predict, click_true, scene, 0)
+            like_auc_1 = scene_auc(like_predict, like_true, scene, 0)
+            follow_auc_1 = scene_auc(follow_predict, follow_true, scene, 0)
+            s5_auc_1 = scene_auc(s5_predict, s5_true, scene, 0)
+            s10_auc_1 = scene_auc(s10_predict, s10_true, scene, 0)
+            s18_auc_1 = scene_auc(s18_predict, s18_true, scene, 0)
+            print("Epoch %d val loss is %.3f, scene 1, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+                                                       click_auc_1, like_auc_1, follow_auc_1, s5_auc_1, s10_auc_1, s18_auc_1))
+
+            # 场景2:       
+            click_auc_2 = scene_auc(click_predict, click_true, scene, 1)
+            like_auc_2 = scene_auc(like_predict, like_true, scene, 1)
+            follow_auc_2 = scene_auc(follow_predict, follow_true, scene, 1)
+            s5_auc_2 = scene_auc(s5_predict, s5_true, scene, 1)
+            s10_auc_2 = scene_auc(s10_predict, s10_true, scene, 1)
+            s18_auc_2 = scene_auc(s18_predict, s18_true, scene, 1)
+            print("Epoch %d val loss is %.3f, scene 2, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+                                                       click_auc_2, like_auc_2, follow_auc_2, s5_auc_2, s10_auc_2, s18_auc_2))
+            # 场景3:
+            click_auc_3 = scene_auc(click_predict, click_true, scene, 2)
+            like_auc_3 = scene_auc(like_predict, like_true, scene, 2)
+            follow_auc_3 = scene_auc(follow_predict, follow_true, scene, 2)
+            s5_auc_3 = scene_auc(s5_predict, s5_true, scene, 2)
+            s10_auc_3 = scene_auc(s10_predict, s10_true, scene, 2)
+            s18_auc_3 = scene_auc(s18_predict, s18_true, scene, 2)
+            print("Epoch %d val loss is %.3f, scene 3, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+                                                       click_auc_3, like_auc_3, follow_auc_3, s5_auc_3, s10_auc_3, s18_auc_3))
+            # 场景4:
+            click_auc_4 = scene_auc(click_predict, click_true, scene, 3)
+            like_auc_4 = scene_auc(like_predict, like_true, scene, 3)
+            follow_auc_4 = scene_auc(follow_predict, follow_true, scene, 3)
+            s5_auc_4 = scene_auc(s5_predict, s5_true, scene, 3)
+            s10_auc_4 = scene_auc(s10_predict, s10_true, scene, 3)
+            s18_auc_4 = scene_auc(s10_predict, s10_true, scene, 3)
+            print("Epoch %d val loss is %.3f, scene 4, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+                                                       click_auc_4, like_auc_4, follow_auc_4, s5_auc_4, s10_auc_4, s18_auc_4))
 
 #            # earl stopping
 #            if i == 0:

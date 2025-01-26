@@ -1,92 +1,611 @@
 nohup: 忽略输入
-2025-01-04 16:00:55.486808: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
-2025-01-04 16:00:55.536447: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+2025-01-12 12:26:25.049692: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-01-12 12:26:25.099338: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
 To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2025-01-04 16:00:56.258204: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
-Namespace(add_num_times=2, alpha=0.4, anneal_cap=0.2, bert_mask_prob=0.3, best_metric='NDCG@10', block_num=2, cand_num=100, ch=True, context_window=2, dataset_path='data/Tenrec/test_ctr.csv', decay_step=5, device='cpu', dilations=[1, 4], dropout=0.3, early_stop=True, embedding_size=32, epochs=100, eval=True, factor_num=128, gamma=0.5, hidden_size=128, hidden_size_list=[128, 128], init_method='default', is_mp=False, is_parallel=False, is_pretrain=1, item_min=10, k=20, kd=False, kernel_size=3, l2_emb=0.0, latent_dim=128, lifelong_eval=True, ll_max_itemnum=0, local_rank=None, loss_type='BPR', lr=0.0001, max_len=20, mess_dropout=0.1, metric_ks=[5, 20], model_name='mmoe', mtl_task_num=2, negsample_savefolder='./data/neg_data/', negsample_size=99, node_dropout=0.1, num_embedding=1, num_gpu=1, num_groups=4, num_heads=4, num_items=1, num_labels=1, num_ng=4, num_users=1, optimizer='default', pad_token=0, pretrain_path='', prun_rate=0, re_epochs=20, reg_1=0.0, reg_2=0.0, rho=0.5, sample='random', sample_method='high-pop', sample_ratio=0.3, save_path='./checkpoint/', seed=100, source_path='', target_path='', task=-1, task1_out=0, task2_out=0, task3_out=0, task4_out=0, task_name='mtl', task_num=4, temp=7, test_batch_size=4096, test_method='ufo', test_size=0.1, total_anneal_steps=1000, train_batch_size=4096, user_profile='gender', val_batch_size=4096, val_method='ufo', val_size=0.1111, valid_rate=100, weight_decay=0.0)
-  0%|          | 0/15 [00:00<?, ?it/s]  7%|▋         | 1/15 [00:00<00:03,  3.69it/s] 13%|█▎        | 2/15 [00:00<00:03,  3.53it/s] 20%|██        | 3/15 [00:00<00:03,  3.70it/s] 33%|███▎      | 5/15 [00:00<00:01,  6.01it/s] 40%|████      | 6/15 [00:01<00:01,  5.29it/s] 47%|████▋     | 7/15 [00:01<00:01,  4.87it/s] 53%|█████▎    | 8/15 [00:01<00:01,  4.60it/s] 60%|██████    | 9/15 [00:01<00:01,  4.44it/s] 67%|██████▋   | 10/15 [00:02<00:01,  4.32it/s] 73%|███████▎  | 11/15 [00:02<00:00,  4.25it/s] 80%|████████  | 12/15 [00:02<00:00,  4.08it/s] 87%|████████▋ | 13/15 [00:02<00:00,  4.08it/s] 93%|█████████▎| 14/15 [00:03<00:00,  4.08it/s]100%|██████████| 15/15 [00:03<00:00,  4.07it/s]100%|██████████| 15/15 [00:03<00:00,  4.32it/s]
-0it [00:00, ?it/s]8it [00:00, 76.92it/s]17it [00:00, 91.33it/s]
-Epoch 1 train loss is 1.393, click auc is 0.504 and like auc is 0.503
-Epoch 1 val loss is 1.258, click auc is 0.529 and like auc is 0.594
-Epoch 2 train loss is 0.742, click auc is 0.529 and like auc is 0.585
-Epoch 2 val loss is 0.716, click auc is 0.536 and like auc is 0.631
-Epoch 3 train loss is 0.717, click auc is 0.542 and like auc is 0.654
-Epoch 3 val loss is 0.714, click auc is 0.546 and like auc is 0.673
-Epoch 4 train loss is 0.713, click auc is 0.554 and like auc is 0.689
-Epoch 4 val loss is 0.710, click auc is 0.557 and like auc is 0.703
-Epoch 5 train loss is 0.709, click auc is 0.569 and like auc is 0.719
-Epoch 5 val loss is 0.706, click auc is 0.571 and like auc is 0.729
-Epoch 6 train loss is 0.702, click auc is 0.586 and like auc is 0.747
-Epoch 6 val loss is 0.700, click auc is 0.588 and like auc is 0.754
-Epoch 7 train loss is 0.694, click auc is 0.604 and like auc is 0.775
-Epoch 7 val loss is 0.693, click auc is 0.603 and like auc is 0.776
-Epoch 8 train loss is 0.686, click auc is 0.621 and like auc is 0.800
-Epoch 8 val loss is 0.686, click auc is 0.617 and like auc is 0.798
-Epoch 9 train loss is 0.678, click auc is 0.636 and like auc is 0.821
-Epoch 9 val loss is 0.680, click auc is 0.629 and like auc is 0.814
-Epoch 10 train loss is 0.670, click auc is 0.649 and like auc is 0.838
-Epoch 10 val loss is 0.674, click auc is 0.639 and like auc is 0.828
-Epoch 11 train loss is 0.663, click auc is 0.660 and like auc is 0.852
-Epoch 11 val loss is 0.669, click auc is 0.647 and like auc is 0.838
-Epoch 12 train loss is 0.657, click auc is 0.669 and like auc is 0.863
-Epoch 12 val loss is 0.664, click auc is 0.654 and like auc is 0.847
-Epoch 13 train loss is 0.651, click auc is 0.677 and like auc is 0.873
-Epoch 13 val loss is 0.661, click auc is 0.659 and like auc is 0.855
-Epoch 14 train loss is 0.646, click auc is 0.684 and like auc is 0.881
-Epoch 14 val loss is 0.658, click auc is 0.664 and like auc is 0.861
-Epoch 15 train loss is 0.642, click auc is 0.690 and like auc is 0.888
-Epoch 15 val loss is 0.655, click auc is 0.668 and like auc is 0.866
-Epoch 16 train loss is 0.637, click auc is 0.695 and like auc is 0.894
-Epoch 16 val loss is 0.653, click auc is 0.672 and like auc is 0.871
-Epoch 17 train loss is 0.634, click auc is 0.700 and like auc is 0.899
-Epoch 17 val loss is 0.650, click auc is 0.675 and like auc is 0.875
-Epoch 18 train loss is 0.631, click auc is 0.704 and like auc is 0.903
-Epoch 18 val loss is 0.649, click auc is 0.678 and like auc is 0.878
-Epoch 19 train loss is 0.627, click auc is 0.708 and like auc is 0.907
-Epoch 19 val loss is 0.647, click auc is 0.680 and like auc is 0.881
-Epoch 20 train loss is 0.625, click auc is 0.712 and like auc is 0.911
-Epoch 20 val loss is 0.646, click auc is 0.682 and like auc is 0.884
-Epoch 21 train loss is 0.622, click auc is 0.715 and like auc is 0.914
-Epoch 21 val loss is 0.644, click auc is 0.684 and like auc is 0.886
-Epoch 22 train loss is 0.619, click auc is 0.718 and like auc is 0.917
-Epoch 22 val loss is 0.643, click auc is 0.686 and like auc is 0.889
-Epoch 23 train loss is 0.617, click auc is 0.721 and like auc is 0.919
-Epoch 23 val loss is 0.643, click auc is 0.687 and like auc is 0.890
-Epoch 24 train loss is 0.615, click auc is 0.724 and like auc is 0.922
-Epoch 24 val loss is 0.641, click auc is 0.689 and like auc is 0.892
-Epoch 25 train loss is 0.612, click auc is 0.726 and like auc is 0.924
-Epoch 25 val loss is 0.641, click auc is 0.690 and like auc is 0.894
-Epoch 26 train loss is 0.610, click auc is 0.729 and like auc is 0.926
-Epoch 26 val loss is 0.640, click auc is 0.692 and like auc is 0.895
-Epoch 27 train loss is 0.608, click auc is 0.731 and like auc is 0.928
-Epoch 27 val loss is 0.639, click auc is 0.693 and like auc is 0.897
-Epoch 28 train loss is 0.606, click auc is 0.734 and like auc is 0.930
-Epoch 28 val loss is 0.638, click auc is 0.694 and like auc is 0.898
-Epoch 29 train loss is 0.604, click auc is 0.736 and like auc is 0.932
-Epoch 29 val loss is 0.638, click auc is 0.695 and like auc is 0.899
-Epoch 30 train loss is 0.602, click auc is 0.738 and like auc is 0.933
-Epoch 30 val loss is 0.638, click auc is 0.696 and like auc is 0.900
-Epoch 31 train loss is 0.600, click auc is 0.740 and like auc is 0.935
-Epoch 31 val loss is 0.637, click auc is 0.697 and like auc is 0.901
-Epoch 32 train loss is 0.598, click auc is 0.743 and like auc is 0.936
-Epoch 32 val loss is 0.637, click auc is 0.698 and like auc is 0.902
-Epoch 33 train loss is 0.597, click auc is 0.745 and like auc is 0.938
-Epoch 33 val loss is 0.636, click auc is 0.699 and like auc is 0.903
-Epoch 34 train loss is 0.595, click auc is 0.747 and like auc is 0.939
-Epoch 34 val loss is 0.637, click auc is 0.699 and like auc is 0.903
-Epoch 35 train loss is 0.593, click auc is 0.749 and like auc is 0.940
-Epoch 35 val loss is 0.636, click auc is 0.700 and like auc is 0.904
-Epoch 36 train loss is 0.591, click auc is 0.751 and like auc is 0.941
-Epoch 36 val loss is 0.636, click auc is 0.701 and like auc is 0.905
-Epoch 37 train loss is 0.589, click auc is 0.753 and like auc is 0.942
-Epoch 37 val loss is 0.635, click auc is 0.702 and like auc is 0.905
-Epoch 38 train loss is 0.588, click auc is 0.755 and like auc is 0.944
-Epoch 38 val loss is 0.636, click auc is 0.702 and like auc is 0.906
-Epoch 39 train loss is 0.586, click auc is 0.757 and like auc is 0.944
-Epoch 39 val loss is 0.636, click auc is 0.703 and like auc is 0.907
-Epoch 40 train loss is 0.584, click auc is 0.759 and like auc is 0.946
-Epoch 40 val loss is 0.635, click auc is 0.704 and like auc is 0.907
-val loss is not decrease in 5 epoch and break training
-/home/suibe/dev_sjl/thesis/Multi-Scenario-Multi-Task-Learning/trainer.py:90: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
-  state = torch.load(path)
-Epoch 40 test loss is 0.634, click auc is 0.704 and like auc is 0.899
+2025-01-12 12:26:25.860171: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+Namespace(add_num_times=2, alpha=0.4, anneal_cap=0.2, bert_mask_prob=0.3, best_metric='NDCG@10', block_num=2, cand_num=100, ch=True, context_window=2, dataset_path='data/KuaiRand/kuai.csv', decay_step=5, device='cpu', dilations=[1, 4], dropout=0.3, early_stop=True, embedding_size=32, epochs=100, eval=True, factor_num=128, gamma=0.5, hidden_size=128, hidden_size_list=[128, 128], init_method='default', is_mp=False, is_parallel=False, is_pretrain=1, item_min=10, k=20, kd=False, kernel_size=3, l2_emb=0.0, latent_dim=128, lifelong_eval=True, ll_max_itemnum=0, local_rank=None, loss_type='BPR', lr=0.0001, max_len=20, mess_dropout=0.1, metric_ks=[5, 20], model_name='mmoe', mtl_task_num=6, negsample_savefolder='./data/neg_data/', negsample_size=99, node_dropout=0.1, num_embedding=1, num_gpu=1, num_groups=4, num_heads=4, num_items=1, num_labels=1, num_ng=4, num_users=1, optimizer='default', pad_token=0, pretrain_path='', prun_rate=0, re_epochs=20, reg_1=0.0, reg_2=0.0, rho=0.5, sample='random', sample_method='high-pop', sample_ratio=0.3, save_path='./checkpoint/', seed=100, source_path='', target_path='', task=-1, task1_out=0, task2_out=0, task3_out=0, task4_out=0, task_name='mtl', task_num=4, temp=7, test_batch_size=4096, test_method='ufo', test_size=0.1, total_anneal_steps=1000, train_batch_size=4096, user_profile='gender', val_batch_size=4096, val_method='ufo', val_size=0.1111, valid_rate=100, weight_decay=0.0)
+digit_columns: ['show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num'] to index
+  0%|          | 0/4 [00:00<?, ?it/s] 25%|██▌       | 1/4 [00:00<00:00,  6.15it/s] 50%|█████     | 2/4 [00:00<00:00,  6.27it/s] 75%|███████▌  | 3/4 [00:00<00:00,  6.43it/s]100%|██████████| 4/4 [00:00<00:00,  6.55it/s]100%|██████████| 4/4 [00:00<00:00,  6.46it/s]
+categorical_columns: ['user_id', 'video_id', 'follow_user_num_range', 'tab', 'fans_user_num_range', 'friend_user_num_range', 'author_id', 'video_type', 'music_type', 'show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num'] to index
+  0%|          | 0/13 [00:00<?, ?it/s] 15%|█▌        | 2/13 [00:00<00:01, 10.26it/s] 31%|███       | 4/13 [00:00<00:01,  8.52it/s] 38%|███▊      | 5/13 [00:00<00:01,  7.17it/s] 46%|████▌     | 6/13 [00:00<00:01,  6.60it/s] 54%|█████▍    | 7/13 [00:00<00:00,  6.68it/s] 62%|██████▏   | 8/13 [00:01<00:00,  6.21it/s] 77%|███████▋  | 10/13 [00:01<00:00,  8.54it/s] 92%|█████████▏| 12/13 [00:01<00:00, 10.35it/s]100%|██████████| 13/13 [00:01<00:00,  8.72it/s]
+0it [00:00, ?it/s]19it [00:00, 199.36it/s]
+Epoch 1 train loss is 4.179, total scene, click auc is 0.586, like auc is 0.502, follow auc is 0.504, 5s auc is 0.592, 10s auc is 0.575, 18s auc is 0.565
+Epoch 1 val loss is 3.842, total scene, click auc is 0.638, like auc is 0.601, follow auc is 0.542, 5s auc is 0.644, 10s auc is 0.631, 18s auc is 0.630
+Epoch 1 val loss is 4.179, scene 1, click auc is 0.508, like auc is 0.503, follow auc is 0.309, 5s auc is 0.510, 10s auc is 0.510, 18s auc is 0.534
+Epoch 1 val loss is 4.179, scene 2, click auc is 0.555, like auc is 0.574, follow auc is 0.537, 5s auc is 0.543, 10s auc is 0.554, 18s auc is 0.564
+Epoch 1 val loss is 4.179, scene 3, click auc is 0.582, like auc is 0.544, follow auc is 0.529, 5s auc is 0.552, 10s auc is 0.572, 18s auc is 0.582
+Epoch 1 val loss is 4.179, scene 4, click auc is 0.542, like auc is 0.526, follow auc is 0.489, 5s auc is 0.534, 10s auc is 0.526, 18s auc is 0.526
+Epoch 2 train loss is 2.673, total scene, click auc is 0.643, like auc is 0.556, follow auc is 0.485, 5s auc is 0.648, 10s auc is 0.636, 18s auc is 0.633
+Epoch 2 val loss is 2.578, total scene, click auc is 0.647, like auc is 0.597, follow auc is 0.541, 5s auc is 0.652, 10s auc is 0.643, 18s auc is 0.645
+Epoch 2 val loss is 2.673, scene 1, click auc is 0.507, like auc is 0.517, follow auc is 0.566, 5s auc is 0.512, 10s auc is 0.515, 18s auc is 0.542
+Epoch 2 val loss is 2.673, scene 2, click auc is 0.562, like auc is 0.569, follow auc is 0.541, 5s auc is 0.548, 10s auc is 0.562, 18s auc is 0.576
+Epoch 2 val loss is 2.673, scene 3, click auc is 0.585, like auc is 0.568, follow auc is 0.555, 5s auc is 0.563, 10s auc is 0.573, 18s auc is 0.596
+Epoch 2 val loss is 2.673, scene 4, click auc is 0.550, like auc is 0.534, follow auc is 0.475, 5s auc is 0.538, 10s auc is 0.533, 18s auc is 0.533
+Epoch 3 train loss is 2.570, total scene, click auc is 0.651, like auc is 0.617, follow auc is 0.492, 5s auc is 0.655, 10s auc is 0.647, 18s auc is 0.649
+Epoch 3 val loss is 2.559, total scene, click auc is 0.654, like auc is 0.622, follow auc is 0.575, 5s auc is 0.659, 10s auc is 0.651, 18s auc is 0.654
+Epoch 3 val loss is 2.570, scene 1, click auc is 0.506, like auc is 0.519, follow auc is 0.470, 5s auc is 0.512, 10s auc is 0.516, 18s auc is 0.548
+Epoch 3 val loss is 2.570, scene 2, click auc is 0.569, like auc is 0.591, follow auc is 0.562, 5s auc is 0.556, 10s auc is 0.571, 18s auc is 0.585
+Epoch 3 val loss is 2.570, scene 3, click auc is 0.590, like auc is 0.584, follow auc is 0.612, 5s auc is 0.573, 10s auc is 0.580, 18s auc is 0.604
+Epoch 3 val loss is 2.570, scene 4, click auc is 0.553, like auc is 0.556, follow auc is 0.470, 5s auc is 0.544, 10s auc is 0.539, 18s auc is 0.539
+Epoch 4 train loss is 2.554, total scene, click auc is 0.656, like auc is 0.634, follow auc is 0.531, 5s auc is 0.661, 10s auc is 0.654, 18s auc is 0.658
+Epoch 4 val loss is 2.546, total scene, click auc is 0.658, like auc is 0.634, follow auc is 0.616, 5s auc is 0.663, 10s auc is 0.656, 18s auc is 0.661
+Epoch 4 val loss is 2.554, scene 1, click auc is 0.505, like auc is 0.520, follow auc is 0.374, 5s auc is 0.513, 10s auc is 0.519, 18s auc is 0.553
+Epoch 4 val loss is 2.554, scene 2, click auc is 0.574, like auc is 0.603, follow auc is 0.595, 5s auc is 0.560, 10s auc is 0.577, 18s auc is 0.593
+Epoch 4 val loss is 2.554, scene 3, click auc is 0.593, like auc is 0.583, follow auc is 0.653, 5s auc is 0.579, 10s auc is 0.585, 18s auc is 0.608
+Epoch 4 val loss is 2.554, scene 4, click auc is 0.559, like auc is 0.568, follow auc is 0.465, 5s auc is 0.548, 10s auc is 0.544, 18s auc is 0.544
+Epoch 5 train loss is 2.543, total scene, click auc is 0.661, like auc is 0.644, follow auc is 0.581, 5s auc is 0.666, 10s auc is 0.659, 18s auc is 0.664
+Epoch 5 val loss is 2.537, total scene, click auc is 0.662, like auc is 0.640, follow auc is 0.655, 5s auc is 0.668, 10s auc is 0.661, 18s auc is 0.666
+Epoch 5 val loss is 2.543, scene 1, click auc is 0.505, like auc is 0.526, follow auc is 0.291, 5s auc is 0.513, 10s auc is 0.520, 18s auc is 0.556
+Epoch 5 val loss is 2.543, scene 2, click auc is 0.579, like auc is 0.609, follow auc is 0.632, 5s auc is 0.567, 10s auc is 0.583, 18s auc is 0.599
+Epoch 5 val loss is 2.543, scene 3, click auc is 0.596, like auc is 0.584, follow auc is 0.677, 5s auc is 0.584, 10s auc is 0.590, 18s auc is 0.613
+Epoch 5 val loss is 2.543, scene 4, click auc is 0.562, like auc is 0.579, follow auc is 0.463, 5s auc is 0.552, 10s auc is 0.548, 18s auc is 0.548
+Epoch 6 train loss is 2.533, total scene, click auc is 0.665, like auc is 0.651, follow auc is 0.625, 5s auc is 0.670, 10s auc is 0.664, 18s auc is 0.669
+Epoch 6 val loss is 2.530, total scene, click auc is 0.664, like auc is 0.644, follow auc is 0.679, 5s auc is 0.670, 10s auc is 0.665, 18s auc is 0.670
+Epoch 6 val loss is 2.533, scene 1, click auc is 0.503, like auc is 0.529, follow auc is 0.250, 5s auc is 0.517, 10s auc is 0.520, 18s auc is 0.560
+Epoch 6 val loss is 2.533, scene 2, click auc is 0.582, like auc is 0.614, follow auc is 0.660, 5s auc is 0.570, 10s auc is 0.587, 18s auc is 0.604
+Epoch 6 val loss is 2.533, scene 3, click auc is 0.598, like auc is 0.581, follow auc is 0.686, 5s auc is 0.587, 10s auc is 0.593, 18s auc is 0.616
+Epoch 6 val loss is 2.533, scene 4, click auc is 0.565, like auc is 0.588, follow auc is 0.464, 5s auc is 0.557, 10s auc is 0.552, 18s auc is 0.552
+Epoch 7 train loss is 2.527, total scene, click auc is 0.668, like auc is 0.655, follow auc is 0.656, 5s auc is 0.673, 10s auc is 0.668, 18s auc is 0.674
+Epoch 7 val loss is 2.524, total scene, click auc is 0.667, like auc is 0.649, follow auc is 0.697, 5s auc is 0.673, 10s auc is 0.668, 18s auc is 0.674
+Epoch 7 val loss is 2.527, scene 1, click auc is 0.503, like auc is 0.525, follow auc is 0.229, 5s auc is 0.516, 10s auc is 0.523, 18s auc is 0.559
+Epoch 7 val loss is 2.527, scene 2, click auc is 0.586, like auc is 0.619, follow auc is 0.682, 5s auc is 0.574, 10s auc is 0.592, 18s auc is 0.609
+Epoch 7 val loss is 2.527, scene 3, click auc is 0.603, like auc is 0.587, follow auc is 0.690, 5s auc is 0.592, 10s auc is 0.595, 18s auc is 0.618
+Epoch 7 val loss is 2.527, scene 4, click auc is 0.569, like auc is 0.592, follow auc is 0.468, 5s auc is 0.561, 10s auc is 0.557, 18s auc is 0.557
+Epoch 8 train loss is 2.521, total scene, click auc is 0.671, like auc is 0.658, follow auc is 0.678, 5s auc is 0.676, 10s auc is 0.672, 18s auc is 0.678
+Epoch 8 val loss is 2.519, total scene, click auc is 0.669, like auc is 0.651, follow auc is 0.706, 5s auc is 0.675, 10s auc is 0.671, 18s auc is 0.677
+Epoch 8 val loss is 2.521, scene 1, click auc is 0.503, like auc is 0.527, follow auc is 0.220, 5s auc is 0.518, 10s auc is 0.524, 18s auc is 0.562
+Epoch 8 val loss is 2.521, scene 2, click auc is 0.589, like auc is 0.621, follow auc is 0.694, 5s auc is 0.576, 10s auc is 0.595, 18s auc is 0.613
+Epoch 8 val loss is 2.521, scene 3, click auc is 0.603, like auc is 0.585, follow auc is 0.692, 5s auc is 0.594, 10s auc is 0.599, 18s auc is 0.622
+Epoch 8 val loss is 2.521, scene 4, click auc is 0.572, like auc is 0.593, follow auc is 0.473, 5s auc is 0.562, 10s auc is 0.560, 18s auc is 0.560
+Epoch 9 train loss is 2.515, total scene, click auc is 0.673, like auc is 0.661, follow auc is 0.692, 5s auc is 0.679, 10s auc is 0.675, 18s auc is 0.682
+Epoch 9 val loss is 2.515, total scene, click auc is 0.672, like auc is 0.651, follow auc is 0.713, 5s auc is 0.678, 10s auc is 0.674, 18s auc is 0.681
+Epoch 9 val loss is 2.515, scene 1, click auc is 0.505, like auc is 0.528, follow auc is 0.227, 5s auc is 0.518, 10s auc is 0.527, 18s auc is 0.565
+Epoch 9 val loss is 2.515, scene 2, click auc is 0.592, like auc is 0.620, follow auc is 0.703, 5s auc is 0.580, 10s auc is 0.599, 18s auc is 0.618
+Epoch 9 val loss is 2.515, scene 3, click auc is 0.607, like auc is 0.585, follow auc is 0.694, 5s auc is 0.599, 10s auc is 0.603, 18s auc is 0.627
+Epoch 9 val loss is 2.515, scene 4, click auc is 0.573, like auc is 0.604, follow auc is 0.484, 5s auc is 0.567, 10s auc is 0.566, 18s auc is 0.566
+Epoch 10 train loss is 2.510, total scene, click auc is 0.676, like auc is 0.663, follow auc is 0.704, 5s auc is 0.682, 10s auc is 0.679, 18s auc is 0.686
+Epoch 10 val loss is 2.511, total scene, click auc is 0.674, like auc is 0.654, follow auc is 0.717, 5s auc is 0.679, 10s auc is 0.676, 18s auc is 0.684
+Epoch 10 val loss is 2.510, scene 1, click auc is 0.507, like auc is 0.534, follow auc is 0.223, 5s auc is 0.520, 10s auc is 0.529, 18s auc is 0.569
+Epoch 10 val loss is 2.510, scene 2, click auc is 0.595, like auc is 0.623, follow auc is 0.706, 5s auc is 0.582, 10s auc is 0.602, 18s auc is 0.622
+Epoch 10 val loss is 2.510, scene 3, click auc is 0.611, like auc is 0.592, follow auc is 0.691, 5s auc is 0.603, 10s auc is 0.607, 18s auc is 0.629
+Epoch 10 val loss is 2.510, scene 4, click auc is 0.576, like auc is 0.602, follow auc is 0.498, 5s auc is 0.570, 10s auc is 0.570, 18s auc is 0.570
+Epoch 11 train loss is 2.506, total scene, click auc is 0.678, like auc is 0.665, follow auc is 0.713, 5s auc is 0.684, 10s auc is 0.682, 18s auc is 0.689
+Epoch 11 val loss is 2.507, total scene, click auc is 0.676, like auc is 0.657, follow auc is 0.719, 5s auc is 0.682, 10s auc is 0.679, 18s auc is 0.687
+Epoch 11 val loss is 2.506, scene 1, click auc is 0.510, like auc is 0.528, follow auc is 0.214, 5s auc is 0.521, 10s auc is 0.530, 18s auc is 0.570
+Epoch 11 val loss is 2.506, scene 2, click auc is 0.598, like auc is 0.627, follow auc is 0.709, 5s auc is 0.585, 10s auc is 0.606, 18s auc is 0.625
+Epoch 11 val loss is 2.506, scene 3, click auc is 0.611, like auc is 0.588, follow auc is 0.685, 5s auc is 0.605, 10s auc is 0.610, 18s auc is 0.633
+Epoch 11 val loss is 2.506, scene 4, click auc is 0.580, like auc is 0.608, follow auc is 0.518, 5s auc is 0.572, 10s auc is 0.573, 18s auc is 0.573
+Epoch 12 train loss is 2.501, total scene, click auc is 0.680, like auc is 0.668, follow auc is 0.719, 5s auc is 0.687, 10s auc is 0.684, 18s auc is 0.693
+Epoch 12 val loss is 2.504, total scene, click auc is 0.677, like auc is 0.656, follow auc is 0.722, 5s auc is 0.684, 10s auc is 0.681, 18s auc is 0.689
+Epoch 12 val loss is 2.501, scene 1, click auc is 0.509, like auc is 0.524, follow auc is 0.209, 5s auc is 0.522, 10s auc is 0.532, 18s auc is 0.572
+Epoch 12 val loss is 2.501, scene 2, click auc is 0.600, like auc is 0.626, follow auc is 0.713, 5s auc is 0.588, 10s auc is 0.609, 18s auc is 0.629
+Epoch 12 val loss is 2.501, scene 3, click auc is 0.615, like auc is 0.595, follow auc is 0.681, 5s auc is 0.608, 10s auc is 0.612, 18s auc is 0.635
+Epoch 12 val loss is 2.501, scene 4, click auc is 0.581, like auc is 0.605, follow auc is 0.534, 5s auc is 0.575, 10s auc is 0.577, 18s auc is 0.577
+Epoch 13 train loss is 2.497, total scene, click auc is 0.683, like auc is 0.669, follow auc is 0.723, 5s auc is 0.689, 10s auc is 0.687, 18s auc is 0.696
+Epoch 13 val loss is 2.500, total scene, click auc is 0.679, like auc is 0.658, follow auc is 0.723, 5s auc is 0.685, 10s auc is 0.684, 18s auc is 0.691
+Epoch 13 val loss is 2.497, scene 1, click auc is 0.511, like auc is 0.530, follow auc is 0.226, 5s auc is 0.524, 10s auc is 0.533, 18s auc is 0.574
+Epoch 13 val loss is 2.497, scene 2, click auc is 0.602, like auc is 0.628, follow auc is 0.714, 5s auc is 0.590, 10s auc is 0.611, 18s auc is 0.632
+Epoch 13 val loss is 2.497, scene 3, click auc is 0.612, like auc is 0.599, follow auc is 0.678, 5s auc is 0.610, 10s auc is 0.615, 18s auc is 0.636
+Epoch 13 val loss is 2.497, scene 4, click auc is 0.585, like auc is 0.613, follow auc is 0.553, 5s auc is 0.578, 10s auc is 0.582, 18s auc is 0.582
+Epoch 14 train loss is 2.492, total scene, click auc is 0.685, like auc is 0.672, follow auc is 0.729, 5s auc is 0.691, 10s auc is 0.690, 18s auc is 0.699
+Epoch 14 val loss is 2.497, total scene, click auc is 0.681, like auc is 0.659, follow auc is 0.726, 5s auc is 0.687, 10s auc is 0.686, 18s auc is 0.694
+Epoch 14 val loss is 2.492, scene 1, click auc is 0.512, like auc is 0.530, follow auc is 0.229, 5s auc is 0.525, 10s auc is 0.535, 18s auc is 0.575
+Epoch 14 val loss is 2.492, scene 2, click auc is 0.605, like auc is 0.628, follow auc is 0.717, 5s auc is 0.593, 10s auc is 0.614, 18s auc is 0.635
+Epoch 14 val loss is 2.492, scene 3, click auc is 0.619, like auc is 0.604, follow auc is 0.680, 5s auc is 0.614, 10s auc is 0.620, 18s auc is 0.645
+Epoch 14 val loss is 2.492, scene 4, click auc is 0.586, like auc is 0.611, follow auc is 0.568, 5s auc is 0.581, 10s auc is 0.585, 18s auc is 0.585
+Epoch 15 train loss is 2.488, total scene, click auc is 0.687, like auc is 0.673, follow auc is 0.733, 5s auc is 0.693, 10s auc is 0.692, 18s auc is 0.702
+Epoch 15 val loss is 2.493, total scene, click auc is 0.682, like auc is 0.662, follow auc is 0.728, 5s auc is 0.689, 10s auc is 0.688, 18s auc is 0.697
+Epoch 15 val loss is 2.488, scene 1, click auc is 0.515, like auc is 0.527, follow auc is 0.223, 5s auc is 0.528, 10s auc is 0.538, 18s auc is 0.579
+Epoch 15 val loss is 2.488, scene 2, click auc is 0.607, like auc is 0.633, follow auc is 0.718, 5s auc is 0.595, 10s auc is 0.617, 18s auc is 0.638
+Epoch 15 val loss is 2.488, scene 3, click auc is 0.618, like auc is 0.602, follow auc is 0.677, 5s auc is 0.616, 10s auc is 0.621, 18s auc is 0.646
+Epoch 15 val loss is 2.488, scene 4, click auc is 0.588, like auc is 0.613, follow auc is 0.594, 5s auc is 0.583, 10s auc is 0.587, 18s auc is 0.587
+Epoch 16 train loss is 2.483, total scene, click auc is 0.689, like auc is 0.676, follow auc is 0.737, 5s auc is 0.695, 10s auc is 0.695, 18s auc is 0.705
+Epoch 16 val loss is 2.490, total scene, click auc is 0.685, like auc is 0.662, follow auc is 0.728, 5s auc is 0.691, 10s auc is 0.690, 18s auc is 0.699
+Epoch 16 val loss is 2.483, scene 1, click auc is 0.517, like auc is 0.535, follow auc is 0.217, 5s auc is 0.531, 10s auc is 0.540, 18s auc is 0.583
+Epoch 16 val loss is 2.483, scene 2, click auc is 0.610, like auc is 0.633, follow auc is 0.718, 5s auc is 0.598, 10s auc is 0.620, 18s auc is 0.642
+Epoch 16 val loss is 2.483, scene 3, click auc is 0.621, like auc is 0.606, follow auc is 0.670, 5s auc is 0.618, 10s auc is 0.624, 18s auc is 0.648
+Epoch 16 val loss is 2.483, scene 4, click auc is 0.591, like auc is 0.612, follow auc is 0.596, 5s auc is 0.586, 10s auc is 0.591, 18s auc is 0.591
+Epoch 17 train loss is 2.478, total scene, click auc is 0.692, like auc is 0.677, follow auc is 0.738, 5s auc is 0.698, 10s auc is 0.697, 18s auc is 0.708
+Epoch 17 val loss is 2.486, total scene, click auc is 0.686, like auc is 0.663, follow auc is 0.731, 5s auc is 0.693, 10s auc is 0.692, 18s auc is 0.702
+Epoch 17 val loss is 2.478, scene 1, click auc is 0.519, like auc is 0.530, follow auc is 0.232, 5s auc is 0.532, 10s auc is 0.541, 18s auc is 0.584
+Epoch 17 val loss is 2.478, scene 2, click auc is 0.612, like auc is 0.633, follow auc is 0.719, 5s auc is 0.600, 10s auc is 0.622, 18s auc is 0.645
+Epoch 17 val loss is 2.478, scene 3, click auc is 0.624, like auc is 0.606, follow auc is 0.670, 5s auc is 0.621, 10s auc is 0.628, 18s auc is 0.653
+Epoch 17 val loss is 2.478, scene 4, click auc is 0.592, like auc is 0.620, follow auc is 0.626, 5s auc is 0.589, 10s auc is 0.593, 18s auc is 0.593
+Epoch 18 train loss is 2.474, total scene, click auc is 0.694, like auc is 0.679, follow auc is 0.741, 5s auc is 0.700, 10s auc is 0.700, 18s auc is 0.710
+Epoch 18 val loss is 2.483, total scene, click auc is 0.688, like auc is 0.666, follow auc is 0.731, 5s auc is 0.694, 10s auc is 0.694, 18s auc is 0.704
+Epoch 18 val loss is 2.474, scene 1, click auc is 0.521, like auc is 0.529, follow auc is 0.276, 5s auc is 0.535, 10s auc is 0.546, 18s auc is 0.589
+Epoch 18 val loss is 2.474, scene 2, click auc is 0.615, like auc is 0.638, follow auc is 0.720, 5s auc is 0.603, 10s auc is 0.625, 18s auc is 0.647
+Epoch 18 val loss is 2.474, scene 3, click auc is 0.627, like auc is 0.602, follow auc is 0.664, 5s auc is 0.624, 10s auc is 0.629, 18s auc is 0.654
+Epoch 18 val loss is 2.474, scene 4, click auc is 0.596, like auc is 0.619, follow auc is 0.634, 5s auc is 0.591, 10s auc is 0.598, 18s auc is 0.598
+Epoch 19 train loss is 2.470, total scene, click auc is 0.696, like auc is 0.681, follow auc is 0.742, 5s auc is 0.702, 10s auc is 0.702, 18s auc is 0.713
+Epoch 19 val loss is 2.479, total scene, click auc is 0.690, like auc is 0.667, follow auc is 0.732, 5s auc is 0.696, 10s auc is 0.696, 18s auc is 0.706
+Epoch 19 val loss is 2.470, scene 1, click auc is 0.524, like auc is 0.533, follow auc is 0.275, 5s auc is 0.536, 10s auc is 0.550, 18s auc is 0.590
+Epoch 19 val loss is 2.470, scene 2, click auc is 0.617, like auc is 0.639, follow auc is 0.718, 5s auc is 0.606, 10s auc is 0.627, 18s auc is 0.650
+Epoch 19 val loss is 2.470, scene 3, click auc is 0.628, like auc is 0.615, follow auc is 0.665, 5s auc is 0.625, 10s auc is 0.632, 18s auc is 0.655
+Epoch 19 val loss is 2.470, scene 4, click auc is 0.597, like auc is 0.618, follow auc is 0.661, 5s auc is 0.593, 10s auc is 0.600, 18s auc is 0.600
+Epoch 20 train loss is 2.465, total scene, click auc is 0.698, like auc is 0.683, follow auc is 0.743, 5s auc is 0.704, 10s auc is 0.704, 18s auc is 0.716
+Epoch 20 val loss is 2.475, total scene, click auc is 0.692, like auc is 0.670, follow auc is 0.731, 5s auc is 0.698, 10s auc is 0.698, 18s auc is 0.708
+Epoch 20 val loss is 2.465, scene 1, click auc is 0.526, like auc is 0.538, follow auc is 0.334, 5s auc is 0.540, 10s auc is 0.553, 18s auc is 0.594
+Epoch 20 val loss is 2.465, scene 2, click auc is 0.620, like auc is 0.642, follow auc is 0.716, 5s auc is 0.608, 10s auc is 0.630, 18s auc is 0.653
+Epoch 20 val loss is 2.465, scene 3, click auc is 0.631, like auc is 0.619, follow auc is 0.669, 5s auc is 0.630, 10s auc is 0.636, 18s auc is 0.660
+Epoch 20 val loss is 2.465, scene 4, click auc is 0.600, like auc is 0.630, follow auc is 0.665, 5s auc is 0.597, 10s auc is 0.603, 18s auc is 0.603
+Epoch 21 train loss is 2.460, total scene, click auc is 0.700, like auc is 0.685, follow auc is 0.746, 5s auc is 0.706, 10s auc is 0.707, 18s auc is 0.718
+Epoch 21 val loss is 2.472, total scene, click auc is 0.693, like auc is 0.668, follow auc is 0.732, 5s auc is 0.700, 10s auc is 0.700, 18s auc is 0.710
+Epoch 21 val loss is 2.460, scene 1, click auc is 0.529, like auc is 0.543, follow auc is 0.263, 5s auc is 0.541, 10s auc is 0.554, 18s auc is 0.595
+Epoch 21 val loss is 2.460, scene 2, click auc is 0.622, like auc is 0.640, follow auc is 0.717, 5s auc is 0.611, 10s auc is 0.633, 18s auc is 0.655
+Epoch 21 val loss is 2.460, scene 3, click auc is 0.634, like auc is 0.610, follow auc is 0.665, 5s auc is 0.632, 10s auc is 0.639, 18s auc is 0.663
+Epoch 21 val loss is 2.460, scene 4, click auc is 0.602, like auc is 0.626, follow auc is 0.677, 5s auc is 0.598, 10s auc is 0.605, 18s auc is 0.605
+Epoch 22 train loss is 2.455, total scene, click auc is 0.703, like auc is 0.687, follow auc is 0.749, 5s auc is 0.709, 10s auc is 0.709, 18s auc is 0.721
+Epoch 22 val loss is 2.468, total scene, click auc is 0.696, like auc is 0.673, follow auc is 0.735, 5s auc is 0.702, 10s auc is 0.702, 18s auc is 0.712
+Epoch 22 val loss is 2.455, scene 1, click auc is 0.532, like auc is 0.538, follow auc is 0.290, 5s auc is 0.543, 10s auc is 0.558, 18s auc is 0.599
+Epoch 22 val loss is 2.455, scene 2, click auc is 0.625, like auc is 0.645, follow auc is 0.720, 5s auc is 0.613, 10s auc is 0.635, 18s auc is 0.658
+Epoch 22 val loss is 2.455, scene 3, click auc is 0.636, like auc is 0.622, follow auc is 0.663, 5s auc is 0.634, 10s auc is 0.642, 18s auc is 0.666
+Epoch 22 val loss is 2.455, scene 4, click auc is 0.604, like auc is 0.630, follow auc is 0.680, 5s auc is 0.601, 10s auc is 0.609, 18s auc is 0.609
+Epoch 23 train loss is 2.451, total scene, click auc is 0.705, like auc is 0.689, follow auc is 0.749, 5s auc is 0.711, 10s auc is 0.711, 18s auc is 0.723
+Epoch 23 val loss is 2.464, total scene, click auc is 0.697, like auc is 0.674, follow auc is 0.736, 5s auc is 0.704, 10s auc is 0.703, 18s auc is 0.714
+Epoch 23 val loss is 2.451, scene 1, click auc is 0.536, like auc is 0.540, follow auc is 0.309, 5s auc is 0.547, 10s auc is 0.560, 18s auc is 0.602
+Epoch 23 val loss is 2.451, scene 2, click auc is 0.627, like auc is 0.646, follow auc is 0.720, 5s auc is 0.616, 10s auc is 0.637, 18s auc is 0.660
+Epoch 23 val loss is 2.451, scene 3, click auc is 0.637, like auc is 0.624, follow auc is 0.668, 5s auc is 0.636, 10s auc is 0.643, 18s auc is 0.667
+Epoch 23 val loss is 2.451, scene 4, click auc is 0.607, like auc is 0.636, follow auc is 0.697, 5s auc is 0.604, 10s auc is 0.611, 18s auc is 0.611
+Epoch 24 train loss is 2.446, total scene, click auc is 0.707, like auc is 0.691, follow auc is 0.753, 5s auc is 0.713, 10s auc is 0.713, 18s auc is 0.725
+Epoch 24 val loss is 2.461, total scene, click auc is 0.699, like auc is 0.675, follow auc is 0.738, 5s auc is 0.706, 10s auc is 0.705, 18s auc is 0.716
+Epoch 24 val loss is 2.446, scene 1, click auc is 0.537, like auc is 0.539, follow auc is 0.367, 5s auc is 0.549, 10s auc is 0.564, 18s auc is 0.604
+Epoch 24 val loss is 2.446, scene 2, click auc is 0.630, like auc is 0.648, follow auc is 0.723, 5s auc is 0.618, 10s auc is 0.640, 18s auc is 0.663
+Epoch 24 val loss is 2.446, scene 3, click auc is 0.640, like auc is 0.624, follow auc is 0.673, 5s auc is 0.639, 10s auc is 0.647, 18s auc is 0.670
+Epoch 24 val loss is 2.446, scene 4, click auc is 0.608, like auc is 0.634, follow auc is 0.684, 5s auc is 0.605, 10s auc is 0.613, 18s auc is 0.613
+Epoch 25 train loss is 2.441, total scene, click auc is 0.709, like auc is 0.694, follow auc is 0.751, 5s auc is 0.715, 10s auc is 0.716, 18s auc is 0.728
+Epoch 25 val loss is 2.457, total scene, click auc is 0.701, like auc is 0.676, follow auc is 0.736, 5s auc is 0.708, 10s auc is 0.707, 18s auc is 0.718
+Epoch 25 val loss is 2.441, scene 1, click auc is 0.540, like auc is 0.548, follow auc is 0.336, 5s auc is 0.554, 10s auc is 0.567, 18s auc is 0.607
+Epoch 25 val loss is 2.441, scene 2, click auc is 0.632, like auc is 0.649, follow auc is 0.721, 5s auc is 0.621, 10s auc is 0.642, 18s auc is 0.665
+Epoch 25 val loss is 2.441, scene 3, click auc is 0.644, like auc is 0.624, follow auc is 0.670, 5s auc is 0.643, 10s auc is 0.650, 18s auc is 0.673
+Epoch 25 val loss is 2.441, scene 4, click auc is 0.612, like auc is 0.641, follow auc is 0.700, 5s auc is 0.609, 10s auc is 0.617, 18s auc is 0.617
+Epoch 26 train loss is 2.436, total scene, click auc is 0.711, like auc is 0.695, follow auc is 0.754, 5s auc is 0.717, 10s auc is 0.718, 18s auc is 0.730
+Epoch 26 val loss is 2.453, total scene, click auc is 0.703, like auc is 0.679, follow auc is 0.735, 5s auc is 0.709, 10s auc is 0.709, 18s auc is 0.720
+Epoch 26 val loss is 2.436, scene 1, click auc is 0.543, like auc is 0.548, follow auc is 0.404, 5s auc is 0.556, 10s auc is 0.571, 18s auc is 0.608
+Epoch 26 val loss is 2.436, scene 2, click auc is 0.634, like auc is 0.651, follow auc is 0.718, 5s auc is 0.623, 10s auc is 0.644, 18s auc is 0.667
+Epoch 26 val loss is 2.436, scene 3, click auc is 0.644, like auc is 0.632, follow auc is 0.673, 5s auc is 0.645, 10s auc is 0.651, 18s auc is 0.676
+Epoch 26 val loss is 2.436, scene 4, click auc is 0.614, like auc is 0.641, follow auc is 0.699, 5s auc is 0.612, 10s auc is 0.620, 18s auc is 0.620
+Epoch 27 train loss is 2.431, total scene, click auc is 0.713, like auc is 0.697, follow auc is 0.755, 5s auc is 0.719, 10s auc is 0.720, 18s auc is 0.732
+Epoch 27 val loss is 2.450, total scene, click auc is 0.705, like auc is 0.682, follow auc is 0.739, 5s auc is 0.711, 10s auc is 0.711, 18s auc is 0.722
+Epoch 27 val loss is 2.431, scene 1, click auc is 0.546, like auc is 0.541, follow auc is 0.327, 5s auc is 0.559, 10s auc is 0.575, 18s auc is 0.613
+Epoch 27 val loss is 2.431, scene 2, click auc is 0.637, like auc is 0.655, follow auc is 0.720, 5s auc is 0.625, 10s auc is 0.647, 18s auc is 0.670
+Epoch 27 val loss is 2.431, scene 3, click auc is 0.647, like auc is 0.630, follow auc is 0.667, 5s auc is 0.646, 10s auc is 0.654, 18s auc is 0.677
+Epoch 27 val loss is 2.431, scene 4, click auc is 0.616, like auc is 0.644, follow auc is 0.735, 5s auc is 0.612, 10s auc is 0.623, 18s auc is 0.623
+Epoch 28 train loss is 2.426, total scene, click auc is 0.716, like auc is 0.699, follow auc is 0.755, 5s auc is 0.722, 10s auc is 0.722, 18s auc is 0.734
+Epoch 28 val loss is 2.446, total scene, click auc is 0.706, like auc is 0.681, follow auc is 0.737, 5s auc is 0.713, 10s auc is 0.712, 18s auc is 0.723
+Epoch 28 val loss is 2.426, scene 1, click auc is 0.549, like auc is 0.545, follow auc is 0.352, 5s auc is 0.562, 10s auc is 0.576, 18s auc is 0.615
+Epoch 28 val loss is 2.426, scene 2, click auc is 0.639, like auc is 0.654, follow auc is 0.718, 5s auc is 0.629, 10s auc is 0.649, 18s auc is 0.672
+Epoch 28 val loss is 2.426, scene 3, click auc is 0.650, like auc is 0.641, follow auc is 0.674, 5s auc is 0.649, 10s auc is 0.657, 18s auc is 0.680
+Epoch 28 val loss is 2.426, scene 4, click auc is 0.619, like auc is 0.640, follow auc is 0.716, 5s auc is 0.616, 10s auc is 0.625, 18s auc is 0.625
+Epoch 29 train loss is 2.421, total scene, click auc is 0.718, like auc is 0.702, follow auc is 0.756, 5s auc is 0.724, 10s auc is 0.724, 18s auc is 0.736
+Epoch 29 val loss is 2.442, total scene, click auc is 0.708, like auc is 0.684, follow auc is 0.737, 5s auc is 0.715, 10s auc is 0.714, 18s auc is 0.725
+Epoch 29 val loss is 2.421, scene 1, click auc is 0.552, like auc is 0.551, follow auc is 0.495, 5s auc is 0.565, 10s auc is 0.580, 18s auc is 0.617
+Epoch 29 val loss is 2.421, scene 2, click auc is 0.642, like auc is 0.658, follow auc is 0.720, 5s auc is 0.631, 10s auc is 0.651, 18s auc is 0.674
+Epoch 29 val loss is 2.421, scene 3, click auc is 0.652, like auc is 0.641, follow auc is 0.685, 5s auc is 0.651, 10s auc is 0.661, 18s auc is 0.682
+Epoch 29 val loss is 2.421, scene 4, click auc is 0.623, like auc is 0.645, follow auc is 0.693, 5s auc is 0.619, 10s auc is 0.628, 18s auc is 0.628
+Epoch 30 train loss is 2.416, total scene, click auc is 0.720, like auc is 0.704, follow auc is 0.758, 5s auc is 0.726, 10s auc is 0.726, 18s auc is 0.738
+Epoch 30 val loss is 2.439, total scene, click auc is 0.710, like auc is 0.684, follow auc is 0.738, 5s auc is 0.717, 10s auc is 0.716, 18s auc is 0.727
+Epoch 30 val loss is 2.416, scene 1, click auc is 0.554, like auc is 0.555, follow auc is 0.446, 5s auc is 0.567, 10s auc is 0.582, 18s auc is 0.620
+Epoch 30 val loss is 2.416, scene 2, click auc is 0.644, like auc is 0.658, follow auc is 0.722, 5s auc is 0.633, 10s auc is 0.653, 18s auc is 0.676
+Epoch 30 val loss is 2.416, scene 3, click auc is 0.655, like auc is 0.642, follow auc is 0.681, 5s auc is 0.653, 10s auc is 0.662, 18s auc is 0.684
+Epoch 30 val loss is 2.416, scene 4, click auc is 0.625, like auc is 0.644, follow auc is 0.696, 5s auc is 0.621, 10s auc is 0.631, 18s auc is 0.631
+Epoch 31 train loss is 2.411, total scene, click auc is 0.722, like auc is 0.705, follow auc is 0.762, 5s auc is 0.728, 10s auc is 0.728, 18s auc is 0.740
+Epoch 31 val loss is 2.435, total scene, click auc is 0.712, like auc is 0.687, follow auc is 0.743, 5s auc is 0.718, 10s auc is 0.718, 18s auc is 0.728
+Epoch 31 val loss is 2.411, scene 1, click auc is 0.557, like auc is 0.554, follow auc is 0.410, 5s auc is 0.569, 10s auc is 0.585, 18s auc is 0.622
+Epoch 31 val loss is 2.411, scene 2, click auc is 0.647, like auc is 0.661, follow auc is 0.725, 5s auc is 0.635, 10s auc is 0.656, 18s auc is 0.678
+Epoch 31 val loss is 2.411, scene 3, click auc is 0.656, like auc is 0.645, follow auc is 0.676, 5s auc is 0.656, 10s auc is 0.665, 18s auc is 0.686
+Epoch 31 val loss is 2.411, scene 4, click auc is 0.627, like auc is 0.648, follow auc is 0.712, 5s auc is 0.624, 10s auc is 0.633, 18s auc is 0.633
+Epoch 32 train loss is 2.405, total scene, click auc is 0.724, like auc is 0.707, follow auc is 0.764, 5s auc is 0.730, 10s auc is 0.730, 18s auc is 0.742
+Epoch 32 val loss is 2.431, total scene, click auc is 0.714, like auc is 0.687, follow auc is 0.743, 5s auc is 0.720, 10s auc is 0.719, 18s auc is 0.730
+Epoch 32 val loss is 2.405, scene 1, click auc is 0.560, like auc is 0.559, follow auc is 0.419, 5s auc is 0.573, 10s auc is 0.591, 18s auc is 0.625
+Epoch 32 val loss is 2.405, scene 2, click auc is 0.649, like auc is 0.662, follow auc is 0.723, 5s auc is 0.638, 10s auc is 0.658, 18s auc is 0.680
+Epoch 32 val loss is 2.405, scene 3, click auc is 0.658, like auc is 0.649, follow auc is 0.684, 5s auc is 0.658, 10s auc is 0.666, 18s auc is 0.687
+Epoch 32 val loss is 2.405, scene 4, click auc is 0.630, like auc is 0.650, follow auc is 0.730, 5s auc is 0.626, 10s auc is 0.636, 18s auc is 0.636
+Epoch 33 train loss is 2.401, total scene, click auc is 0.726, like auc is 0.709, follow auc is 0.765, 5s auc is 0.732, 10s auc is 0.732, 18s auc is 0.744
+Epoch 33 val loss is 2.427, total scene, click auc is 0.715, like auc is 0.690, follow auc is 0.745, 5s auc is 0.722, 10s auc is 0.721, 18s auc is 0.732
+Epoch 33 val loss is 2.401, scene 1, click auc is 0.563, like auc is 0.563, follow auc is 0.427, 5s auc is 0.576, 10s auc is 0.591, 18s auc is 0.627
+Epoch 33 val loss is 2.401, scene 2, click auc is 0.651, like auc is 0.664, follow auc is 0.726, 5s auc is 0.640, 10s auc is 0.660, 18s auc is 0.682
+Epoch 33 val loss is 2.401, scene 3, click auc is 0.661, like auc is 0.653, follow auc is 0.680, 5s auc is 0.659, 10s auc is 0.670, 18s auc is 0.691
+Epoch 33 val loss is 2.401, scene 4, click auc is 0.632, like auc is 0.651, follow auc is 0.727, 5s auc is 0.629, 10s auc is 0.638, 18s auc is 0.638
+Epoch 34 train loss is 2.396, total scene, click auc is 0.728, like auc is 0.711, follow auc is 0.763, 5s auc is 0.734, 10s auc is 0.734, 18s auc is 0.746
+Epoch 34 val loss is 2.424, total scene, click auc is 0.717, like auc is 0.691, follow auc is 0.745, 5s auc is 0.724, 10s auc is 0.722, 18s auc is 0.733
+Epoch 34 val loss is 2.396, scene 1, click auc is 0.566, like auc is 0.566, follow auc is 0.460, 5s auc is 0.579, 10s auc is 0.596, 18s auc is 0.629
+Epoch 34 val loss is 2.396, scene 2, click auc is 0.654, like auc is 0.665, follow auc is 0.724, 5s auc is 0.643, 10s auc is 0.662, 18s auc is 0.684
+Epoch 34 val loss is 2.396, scene 3, click auc is 0.663, like auc is 0.652, follow auc is 0.683, 5s auc is 0.663, 10s auc is 0.672, 18s auc is 0.692
+Epoch 34 val loss is 2.396, scene 4, click auc is 0.635, like auc is 0.653, follow auc is 0.747, 5s auc is 0.631, 10s auc is 0.641, 18s auc is 0.641
+Epoch 35 train loss is 2.391, total scene, click auc is 0.730, like auc is 0.713, follow auc is 0.766, 5s auc is 0.736, 10s auc is 0.736, 18s auc is 0.748
+Epoch 35 val loss is 2.420, total scene, click auc is 0.718, like auc is 0.692, follow auc is 0.742, 5s auc is 0.725, 10s auc is 0.724, 18s auc is 0.735
+Epoch 35 val loss is 2.391, scene 1, click auc is 0.567, like auc is 0.572, follow auc is 0.421, 5s auc is 0.581, 10s auc is 0.598, 18s auc is 0.631
+Epoch 35 val loss is 2.391, scene 2, click auc is 0.655, like auc is 0.667, follow auc is 0.719, 5s auc is 0.645, 10s auc is 0.664, 18s auc is 0.686
+Epoch 35 val loss is 2.391, scene 3, click auc is 0.666, like auc is 0.654, follow auc is 0.685, 5s auc is 0.664, 10s auc is 0.675, 18s auc is 0.695
+Epoch 35 val loss is 2.391, scene 4, click auc is 0.636, like auc is 0.656, follow auc is 0.762, 5s auc is 0.633, 10s auc is 0.643, 18s auc is 0.643
+Epoch 36 train loss is 2.386, total scene, click auc is 0.732, like auc is 0.714, follow auc is 0.766, 5s auc is 0.738, 10s auc is 0.738, 18s auc is 0.750
+Epoch 36 val loss is 2.417, total scene, click auc is 0.720, like auc is 0.694, follow auc is 0.742, 5s auc is 0.727, 10s auc is 0.726, 18s auc is 0.736
+Epoch 36 val loss is 2.386, scene 1, click auc is 0.570, like auc is 0.570, follow auc is 0.487, 5s auc is 0.585, 10s auc is 0.602, 18s auc is 0.635
+Epoch 36 val loss is 2.386, scene 2, click auc is 0.658, like auc is 0.669, follow auc is 0.720, 5s auc is 0.647, 10s auc is 0.666, 18s auc is 0.688
+Epoch 36 val loss is 2.386, scene 3, click auc is 0.666, like auc is 0.659, follow auc is 0.692, 5s auc is 0.667, 10s auc is 0.676, 18s auc is 0.695
+Epoch 36 val loss is 2.386, scene 4, click auc is 0.639, like auc is 0.657, follow auc is 0.737, 5s auc is 0.635, 10s auc is 0.646, 18s auc is 0.646
+Epoch 37 train loss is 2.380, total scene, click auc is 0.734, like auc is 0.717, follow auc is 0.770, 5s auc is 0.740, 10s auc is 0.740, 18s auc is 0.752
+Epoch 37 val loss is 2.412, total scene, click auc is 0.722, like auc is 0.696, follow auc is 0.741, 5s auc is 0.729, 10s auc is 0.727, 18s auc is 0.738
+Epoch 37 val loss is 2.380, scene 1, click auc is 0.574, like auc is 0.571, follow auc is 0.426, 5s auc is 0.588, 10s auc is 0.604, 18s auc is 0.637
+Epoch 37 val loss is 2.380, scene 2, click auc is 0.660, like auc is 0.671, follow auc is 0.716, 5s auc is 0.649, 10s auc is 0.668, 18s auc is 0.690
+Epoch 37 val loss is 2.380, scene 3, click auc is 0.668, like auc is 0.661, follow auc is 0.689, 5s auc is 0.668, 10s auc is 0.679, 18s auc is 0.698
+Epoch 37 val loss is 2.380, scene 4, click auc is 0.642, like auc is 0.658, follow auc is 0.772, 5s auc is 0.638, 10s auc is 0.648, 18s auc is 0.648
+Epoch 38 train loss is 2.375, total scene, click auc is 0.735, like auc is 0.719, follow auc is 0.767, 5s auc is 0.742, 10s auc is 0.742, 18s auc is 0.754
+Epoch 38 val loss is 2.409, total scene, click auc is 0.723, like auc is 0.696, follow auc is 0.745, 5s auc is 0.730, 10s auc is 0.729, 18s auc is 0.739
+Epoch 38 val loss is 2.375, scene 1, click auc is 0.575, like auc is 0.580, follow auc is 0.449, 5s auc is 0.590, 10s auc is 0.607, 18s auc is 0.638
+Epoch 38 val loss is 2.375, scene 2, click auc is 0.662, like auc is 0.671, follow auc is 0.724, 5s auc is 0.651, 10s auc is 0.669, 18s auc is 0.692
+Epoch 38 val loss is 2.375, scene 3, click auc is 0.671, like auc is 0.663, follow auc is 0.686, 5s auc is 0.670, 10s auc is 0.680, 18s auc is 0.700
+Epoch 38 val loss is 2.375, scene 4, click auc is 0.644, like auc is 0.660, follow auc is 0.747, 5s auc is 0.639, 10s auc is 0.651, 18s auc is 0.651
+Epoch 39 train loss is 2.371, total scene, click auc is 0.737, like auc is 0.720, follow auc is 0.770, 5s auc is 0.743, 10s auc is 0.743, 18s auc is 0.755
+Epoch 39 val loss is 2.405, total scene, click auc is 0.725, like auc is 0.699, follow auc is 0.745, 5s auc is 0.731, 10s auc is 0.730, 18s auc is 0.740
+Epoch 39 val loss is 2.371, scene 1, click auc is 0.579, like auc is 0.580, follow auc is 0.460, 5s auc is 0.592, 10s auc is 0.609, 18s auc is 0.640
+Epoch 39 val loss is 2.371, scene 2, click auc is 0.664, like auc is 0.675, follow auc is 0.726, 5s auc is 0.653, 10s auc is 0.671, 18s auc is 0.693
+Epoch 39 val loss is 2.371, scene 3, click auc is 0.672, like auc is 0.661, follow auc is 0.684, 5s auc is 0.673, 10s auc is 0.682, 18s auc is 0.700
+Epoch 39 val loss is 2.371, scene 4, click auc is 0.646, like auc is 0.664, follow auc is 0.721, 5s auc is 0.642, 10s auc is 0.653, 18s auc is 0.653
+Epoch 40 train loss is 2.366, total scene, click auc is 0.739, like auc is 0.722, follow auc is 0.772, 5s auc is 0.745, 10s auc is 0.745, 18s auc is 0.757
+Epoch 40 val loss is 2.402, total scene, click auc is 0.726, like auc is 0.700, follow auc is 0.748, 5s auc is 0.733, 10s auc is 0.731, 18s auc is 0.742
+Epoch 40 val loss is 2.366, scene 1, click auc is 0.580, like auc is 0.580, follow auc is 0.478, 5s auc is 0.595, 10s auc is 0.612, 18s auc is 0.643
+Epoch 40 val loss is 2.366, scene 2, click auc is 0.666, like auc is 0.677, follow auc is 0.724, 5s auc is 0.655, 10s auc is 0.673, 18s auc is 0.695
+Epoch 40 val loss is 2.366, scene 3, click auc is 0.674, like auc is 0.670, follow auc is 0.685, 5s auc is 0.674, 10s auc is 0.684, 18s auc is 0.703
+Epoch 40 val loss is 2.366, scene 4, click auc is 0.648, like auc is 0.658, follow auc is 0.770, 5s auc is 0.644, 10s auc is 0.655, 18s auc is 0.655
+Epoch 41 train loss is 2.361, total scene, click auc is 0.741, like auc is 0.724, follow auc is 0.774, 5s auc is 0.747, 10s auc is 0.747, 18s auc is 0.758
+Epoch 41 val loss is 2.398, total scene, click auc is 0.728, like auc is 0.703, follow auc is 0.746, 5s auc is 0.734, 10s auc is 0.733, 18s auc is 0.743
+Epoch 41 val loss is 2.361, scene 1, click auc is 0.583, like auc is 0.580, follow auc is 0.513, 5s auc is 0.598, 10s auc is 0.615, 18s auc is 0.645
+Epoch 41 val loss is 2.361, scene 2, click auc is 0.668, like auc is 0.679, follow auc is 0.724, 5s auc is 0.657, 10s auc is 0.675, 18s auc is 0.697
+Epoch 41 val loss is 2.361, scene 3, click auc is 0.675, like auc is 0.668, follow auc is 0.694, 5s auc is 0.675, 10s auc is 0.686, 18s auc is 0.704
+Epoch 41 val loss is 2.361, scene 4, click auc is 0.650, like auc is 0.666, follow auc is 0.741, 5s auc is 0.646, 10s auc is 0.657, 18s auc is 0.657
+Epoch 42 train loss is 2.356, total scene, click auc is 0.742, like auc is 0.726, follow auc is 0.773, 5s auc is 0.748, 10s auc is 0.748, 18s auc is 0.760
+Epoch 42 val loss is 2.396, total scene, click auc is 0.729, like auc is 0.704, follow auc is 0.749, 5s auc is 0.736, 10s auc is 0.734, 18s auc is 0.744
+Epoch 42 val loss is 2.356, scene 1, click auc is 0.586, like auc is 0.586, follow auc is 0.476, 5s auc is 0.601, 10s auc is 0.618, 18s auc is 0.647
+Epoch 42 val loss is 2.356, scene 2, click auc is 0.669, like auc is 0.681, follow auc is 0.727, 5s auc is 0.659, 10s auc is 0.676, 18s auc is 0.698
+Epoch 42 val loss is 2.356, scene 3, click auc is 0.677, like auc is 0.674, follow auc is 0.688, 5s auc is 0.677, 10s auc is 0.688, 18s auc is 0.706
+Epoch 42 val loss is 2.356, scene 4, click auc is 0.652, like auc is 0.663, follow auc is 0.744, 5s auc is 0.648, 10s auc is 0.659, 18s auc is 0.659
+Epoch 43 train loss is 2.352, total scene, click auc is 0.744, like auc is 0.727, follow auc is 0.772, 5s auc is 0.750, 10s auc is 0.750, 18s auc is 0.761
+Epoch 43 val loss is 2.392, total scene, click auc is 0.730, like auc is 0.706, follow auc is 0.749, 5s auc is 0.737, 10s auc is 0.736, 18s auc is 0.746
+Epoch 43 val loss is 2.352, scene 1, click auc is 0.587, like auc is 0.587, follow auc is 0.515, 5s auc is 0.603, 10s auc is 0.620, 18s auc is 0.649
+Epoch 43 val loss is 2.352, scene 2, click auc is 0.671, like auc is 0.683, follow auc is 0.727, 5s auc is 0.661, 10s auc is 0.678, 18s auc is 0.700
+Epoch 43 val loss is 2.352, scene 3, click auc is 0.680, like auc is 0.673, follow auc is 0.699, 5s auc is 0.679, 10s auc is 0.690, 18s auc is 0.708
+Epoch 43 val loss is 2.352, scene 4, click auc is 0.655, like auc is 0.672, follow auc is 0.746, 5s auc is 0.650, 10s auc is 0.661, 18s auc is 0.661
+Epoch 44 train loss is 2.347, total scene, click auc is 0.746, like auc is 0.729, follow auc is 0.774, 5s auc is 0.752, 10s auc is 0.751, 18s auc is 0.763
+Epoch 44 val loss is 2.389, total scene, click auc is 0.732, like auc is 0.707, follow auc is 0.752, 5s auc is 0.738, 10s auc is 0.737, 18s auc is 0.747
+Epoch 44 val loss is 2.347, scene 1, click auc is 0.590, like auc is 0.590, follow auc is 0.555, 5s auc is 0.606, 10s auc is 0.622, 18s auc is 0.652
+Epoch 44 val loss is 2.347, scene 2, click auc is 0.673, like auc is 0.684, follow auc is 0.731, 5s auc is 0.663, 10s auc is 0.680, 18s auc is 0.701
+Epoch 44 val loss is 2.347, scene 3, click auc is 0.681, like auc is 0.679, follow auc is 0.695, 5s auc is 0.682, 10s auc is 0.691, 18s auc is 0.709
+Epoch 44 val loss is 2.347, scene 4, click auc is 0.657, like auc is 0.668, follow auc is 0.751, 5s auc is 0.652, 10s auc is 0.663, 18s auc is 0.663
+Epoch 45 train loss is 2.342, total scene, click auc is 0.747, like auc is 0.731, follow auc is 0.775, 5s auc is 0.753, 10s auc is 0.753, 18s auc is 0.764
+Epoch 45 val loss is 2.386, total scene, click auc is 0.733, like auc is 0.708, follow auc is 0.749, 5s auc is 0.739, 10s auc is 0.738, 18s auc is 0.748
+Epoch 45 val loss is 2.342, scene 1, click auc is 0.593, like auc is 0.593, follow auc is 0.563, 5s auc is 0.609, 10s auc is 0.625, 18s auc is 0.654
+Epoch 45 val loss is 2.342, scene 2, click auc is 0.675, like auc is 0.685, follow auc is 0.727, 5s auc is 0.664, 10s auc is 0.681, 18s auc is 0.703
+Epoch 45 val loss is 2.342, scene 3, click auc is 0.683, like auc is 0.678, follow auc is 0.706, 5s auc is 0.683, 10s auc is 0.693, 18s auc is 0.710
+Epoch 45 val loss is 2.342, scene 4, click auc is 0.659, like auc is 0.672, follow auc is 0.745, 5s auc is 0.654, 10s auc is 0.665, 18s auc is 0.665
+Epoch 46 train loss is 2.337, total scene, click auc is 0.749, like auc is 0.733, follow auc is 0.776, 5s auc is 0.755, 10s auc is 0.754, 18s auc is 0.766
+Epoch 46 val loss is 2.383, total scene, click auc is 0.734, like auc is 0.709, follow auc is 0.749, 5s auc is 0.741, 10s auc is 0.739, 18s auc is 0.749
+Epoch 46 val loss is 2.337, scene 1, click auc is 0.594, like auc is 0.596, follow auc is 0.549, 5s auc is 0.610, 10s auc is 0.627, 18s auc is 0.655
+Epoch 46 val loss is 2.337, scene 2, click auc is 0.676, like auc is 0.686, follow auc is 0.729, 5s auc is 0.666, 10s auc is 0.683, 18s auc is 0.704
+Epoch 46 val loss is 2.337, scene 3, click auc is 0.684, like auc is 0.684, follow auc is 0.705, 5s auc is 0.685, 10s auc is 0.696, 18s auc is 0.712
+Epoch 46 val loss is 2.337, scene 4, click auc is 0.660, like auc is 0.672, follow auc is 0.736, 5s auc is 0.656, 10s auc is 0.666, 18s auc is 0.666
+Epoch 47 train loss is 2.333, total scene, click auc is 0.750, like auc is 0.734, follow auc is 0.776, 5s auc is 0.756, 10s auc is 0.756, 18s auc is 0.767
+Epoch 47 val loss is 2.380, total scene, click auc is 0.735, like auc is 0.711, follow auc is 0.748, 5s auc is 0.742, 10s auc is 0.740, 18s auc is 0.750
+Epoch 47 val loss is 2.333, scene 1, click auc is 0.596, like auc is 0.596, follow auc is 0.528, 5s auc is 0.612, 10s auc is 0.630, 18s auc is 0.657
+Epoch 47 val loss is 2.333, scene 2, click auc is 0.678, like auc is 0.689, follow auc is 0.726, 5s auc is 0.668, 10s auc is 0.684, 18s auc is 0.705
+Epoch 47 val loss is 2.333, scene 3, click auc is 0.685, like auc is 0.683, follow auc is 0.699, 5s auc is 0.686, 10s auc is 0.696, 18s auc is 0.713
+Epoch 47 val loss is 2.333, scene 4, click auc is 0.662, like auc is 0.676, follow auc is 0.731, 5s auc is 0.657, 10s auc is 0.668, 18s auc is 0.668
+Epoch 48 train loss is 2.329, total scene, click auc is 0.752, like auc is 0.736, follow auc is 0.778, 5s auc is 0.757, 10s auc is 0.757, 18s auc is 0.769
+Epoch 48 val loss is 2.377, total scene, click auc is 0.737, like auc is 0.713, follow auc is 0.749, 5s auc is 0.743, 10s auc is 0.741, 18s auc is 0.751
+Epoch 48 val loss is 2.329, scene 1, click auc is 0.599, like auc is 0.595, follow auc is 0.514, 5s auc is 0.614, 10s auc is 0.631, 18s auc is 0.658
+Epoch 48 val loss is 2.329, scene 2, click auc is 0.679, like auc is 0.691, follow auc is 0.727, 5s auc is 0.669, 10s auc is 0.685, 18s auc is 0.706
+Epoch 48 val loss is 2.329, scene 3, click auc is 0.686, like auc is 0.685, follow auc is 0.702, 5s auc is 0.688, 10s auc is 0.697, 18s auc is 0.714
+Epoch 48 val loss is 2.329, scene 4, click auc is 0.664, like auc is 0.678, follow auc is 0.736, 5s auc is 0.659, 10s auc is 0.670, 18s auc is 0.670
+Epoch 49 train loss is 2.324, total scene, click auc is 0.753, like auc is 0.737, follow auc is 0.780, 5s auc is 0.759, 10s auc is 0.759, 18s auc is 0.770
+Epoch 49 val loss is 2.373, total scene, click auc is 0.738, like auc is 0.714, follow auc is 0.753, 5s auc is 0.744, 10s auc is 0.742, 18s auc is 0.752
+Epoch 49 val loss is 2.324, scene 1, click auc is 0.600, like auc is 0.600, follow auc is 0.593, 5s auc is 0.617, 10s auc is 0.634, 18s auc is 0.659
+Epoch 49 val loss is 2.324, scene 2, click auc is 0.681, like auc is 0.692, follow auc is 0.730, 5s auc is 0.671, 10s auc is 0.687, 18s auc is 0.708
+Epoch 49 val loss is 2.324, scene 3, click auc is 0.688, like auc is 0.688, follow auc is 0.701, 5s auc is 0.690, 10s auc is 0.700, 18s auc is 0.716
+Epoch 49 val loss is 2.324, scene 4, click auc is 0.666, like auc is 0.673, follow auc is 0.762, 5s auc is 0.660, 10s auc is 0.672, 18s auc is 0.672
+Epoch 50 train loss is 2.320, total scene, click auc is 0.755, like auc is 0.739, follow auc is 0.781, 5s auc is 0.760, 10s auc is 0.760, 18s auc is 0.771
+Epoch 50 val loss is 2.371, total scene, click auc is 0.739, like auc is 0.715, follow auc is 0.753, 5s auc is 0.745, 10s auc is 0.744, 18s auc is 0.753
+Epoch 50 val loss is 2.320, scene 1, click auc is 0.603, like auc is 0.601, follow auc is 0.579, 5s auc is 0.619, 10s auc is 0.635, 18s auc is 0.662
+Epoch 50 val loss is 2.320, scene 2, click auc is 0.682, like auc is 0.694, follow auc is 0.732, 5s auc is 0.672, 10s auc is 0.688, 18s auc is 0.709
+Epoch 50 val loss is 2.320, scene 3, click auc is 0.690, like auc is 0.689, follow auc is 0.704, 5s auc is 0.691, 10s auc is 0.702, 18s auc is 0.718
+Epoch 50 val loss is 2.320, scene 4, click auc is 0.668, like auc is 0.677, follow auc is 0.746, 5s auc is 0.662, 10s auc is 0.674, 18s auc is 0.674
+Epoch 51 train loss is 2.316, total scene, click auc is 0.756, like auc is 0.740, follow auc is 0.784, 5s auc is 0.762, 10s auc is 0.761, 18s auc is 0.772
+Epoch 51 val loss is 2.368, total scene, click auc is 0.740, like auc is 0.717, follow auc is 0.750, 5s auc is 0.746, 10s auc is 0.744, 18s auc is 0.754
+Epoch 51 val loss is 2.316, scene 1, click auc is 0.604, like auc is 0.601, follow auc is 0.571, 5s auc is 0.621, 10s auc is 0.638, 18s auc is 0.663
+Epoch 51 val loss is 2.316, scene 2, click auc is 0.684, like auc is 0.695, follow auc is 0.725, 5s auc is 0.674, 10s auc is 0.689, 18s auc is 0.710
+Epoch 51 val loss is 2.316, scene 3, click auc is 0.691, like auc is 0.693, follow auc is 0.716, 5s auc is 0.692, 10s auc is 0.703, 18s auc is 0.718
+Epoch 51 val loss is 2.316, scene 4, click auc is 0.669, like auc is 0.679, follow auc is 0.765, 5s auc is 0.664, 10s auc is 0.675, 18s auc is 0.675
+Epoch 52 train loss is 2.312, total scene, click auc is 0.757, like auc is 0.742, follow auc is 0.785, 5s auc is 0.763, 10s auc is 0.762, 18s auc is 0.774
+Epoch 52 val loss is 2.365, total scene, click auc is 0.741, like auc is 0.718, follow auc is 0.754, 5s auc is 0.747, 10s auc is 0.745, 18s auc is 0.755
+Epoch 52 val loss is 2.312, scene 1, click auc is 0.606, like auc is 0.605, follow auc is 0.588, 5s auc is 0.623, 10s auc is 0.640, 18s auc is 0.665
+Epoch 52 val loss is 2.312, scene 2, click auc is 0.685, like auc is 0.697, follow auc is 0.730, 5s auc is 0.675, 10s auc is 0.691, 18s auc is 0.712
+Epoch 52 val loss is 2.312, scene 3, click auc is 0.692, like auc is 0.692, follow auc is 0.710, 5s auc is 0.693, 10s auc is 0.704, 18s auc is 0.720
+Epoch 52 val loss is 2.312, scene 4, click auc is 0.671, like auc is 0.681, follow auc is 0.752, 5s auc is 0.665, 10s auc is 0.677, 18s auc is 0.677
+Epoch 53 train loss is 2.308, total scene, click auc is 0.758, like auc is 0.743, follow auc is 0.784, 5s auc is 0.764, 10s auc is 0.764, 18s auc is 0.775
+Epoch 53 val loss is 2.363, total scene, click auc is 0.742, like auc is 0.719, follow auc is 0.756, 5s auc is 0.748, 10s auc is 0.746, 18s auc is 0.756
+Epoch 53 val loss is 2.308, scene 1, click auc is 0.608, like auc is 0.607, follow auc is 0.610, 5s auc is 0.624, 10s auc is 0.642, 18s auc is 0.666
+Epoch 53 val loss is 2.308, scene 2, click auc is 0.686, like auc is 0.698, follow auc is 0.732, 5s auc is 0.676, 10s auc is 0.692, 18s auc is 0.713
+Epoch 53 val loss is 2.308, scene 3, click auc is 0.693, like auc is 0.693, follow auc is 0.711, 5s auc is 0.695, 10s auc is 0.705, 18s auc is 0.720
+Epoch 53 val loss is 2.308, scene 4, click auc is 0.672, like auc is 0.682, follow auc is 0.770, 5s auc is 0.667, 10s auc is 0.678, 18s auc is 0.678
+Epoch 54 train loss is 2.304, total scene, click auc is 0.760, like auc is 0.745, follow auc is 0.783, 5s auc is 0.765, 10s auc is 0.765, 18s auc is 0.776
+Epoch 54 val loss is 2.360, total scene, click auc is 0.743, like auc is 0.720, follow auc is 0.754, 5s auc is 0.749, 10s auc is 0.747, 18s auc is 0.757
+Epoch 54 val loss is 2.304, scene 1, click auc is 0.610, like auc is 0.612, follow auc is 0.615, 5s auc is 0.627, 10s auc is 0.642, 18s auc is 0.667
+Epoch 54 val loss is 2.304, scene 2, click auc is 0.688, like auc is 0.700, follow auc is 0.732, 5s auc is 0.678, 10s auc is 0.693, 18s auc is 0.714
+Epoch 54 val loss is 2.304, scene 3, click auc is 0.695, like auc is 0.697, follow auc is 0.708, 5s auc is 0.696, 10s auc is 0.707, 18s auc is 0.723
+Epoch 54 val loss is 2.304, scene 4, click auc is 0.673, like auc is 0.682, follow auc is 0.763, 5s auc is 0.668, 10s auc is 0.679, 18s auc is 0.679
+Epoch 55 train loss is 2.300, total scene, click auc is 0.761, like auc is 0.746, follow auc is 0.786, 5s auc is 0.766, 10s auc is 0.766, 18s auc is 0.777
+Epoch 55 val loss is 2.357, total scene, click auc is 0.744, like auc is 0.722, follow auc is 0.755, 5s auc is 0.750, 10s auc is 0.748, 18s auc is 0.758
+Epoch 55 val loss is 2.300, scene 1, click auc is 0.611, like auc is 0.611, follow auc is 0.571, 5s auc is 0.628, 10s auc is 0.644, 18s auc is 0.669
+Epoch 55 val loss is 2.300, scene 2, click auc is 0.689, like auc is 0.701, follow auc is 0.733, 5s auc is 0.679, 10s auc is 0.694, 18s auc is 0.715
+Epoch 55 val loss is 2.300, scene 3, click auc is 0.697, like auc is 0.699, follow auc is 0.709, 5s auc is 0.698, 10s auc is 0.708, 18s auc is 0.723
+Epoch 55 val loss is 2.300, scene 4, click auc is 0.675, like auc is 0.683, follow auc is 0.756, 5s auc is 0.670, 10s auc is 0.681, 18s auc is 0.681
+Epoch 56 train loss is 2.296, total scene, click auc is 0.762, like auc is 0.748, follow auc is 0.784, 5s auc is 0.768, 10s auc is 0.767, 18s auc is 0.778
+Epoch 56 val loss is 2.356, total scene, click auc is 0.745, like auc is 0.724, follow auc is 0.753, 5s auc is 0.751, 10s auc is 0.749, 18s auc is 0.759
+Epoch 56 val loss is 2.296, scene 1, click auc is 0.613, like auc is 0.612, follow auc is 0.549, 5s auc is 0.630, 10s auc is 0.646, 18s auc is 0.671
+Epoch 56 val loss is 2.296, scene 2, click auc is 0.690, like auc is 0.704, follow auc is 0.729, 5s auc is 0.680, 10s auc is 0.695, 18s auc is 0.716
+Epoch 56 val loss is 2.296, scene 3, click auc is 0.697, like auc is 0.702, follow auc is 0.708, 5s auc is 0.699, 10s auc is 0.710, 18s auc is 0.725
+Epoch 56 val loss is 2.296, scene 4, click auc is 0.677, like auc is 0.683, follow auc is 0.766, 5s auc is 0.672, 10s auc is 0.682, 18s auc is 0.682
+Epoch 57 train loss is 2.292, total scene, click auc is 0.763, like auc is 0.749, follow auc is 0.783, 5s auc is 0.769, 10s auc is 0.768, 18s auc is 0.779
+Epoch 57 val loss is 2.354, total scene, click auc is 0.745, like auc is 0.724, follow auc is 0.753, 5s auc is 0.752, 10s auc is 0.750, 18s auc is 0.760
+Epoch 57 val loss is 2.292, scene 1, click auc is 0.614, like auc is 0.615, follow auc is 0.609, 5s auc is 0.631, 10s auc is 0.648, 18s auc is 0.671
+Epoch 57 val loss is 2.292, scene 2, click auc is 0.691, like auc is 0.704, follow auc is 0.730, 5s auc is 0.681, 10s auc is 0.696, 18s auc is 0.717
+Epoch 57 val loss is 2.292, scene 3, click auc is 0.699, like auc is 0.703, follow auc is 0.714, 5s auc is 0.701, 10s auc is 0.710, 18s auc is 0.725
+Epoch 57 val loss is 2.292, scene 4, click auc is 0.677, like auc is 0.683, follow auc is 0.761, 5s auc is 0.672, 10s auc is 0.684, 18s auc is 0.684
+Epoch 58 train loss is 2.289, total scene, click auc is 0.764, like auc is 0.750, follow auc is 0.788, 5s auc is 0.770, 10s auc is 0.769, 18s auc is 0.780
+Epoch 58 val loss is 2.350, total scene, click auc is 0.747, like auc is 0.725, follow auc is 0.752, 5s auc is 0.753, 10s auc is 0.751, 18s auc is 0.761
+Epoch 58 val loss is 2.289, scene 1, click auc is 0.616, like auc is 0.618, follow auc is 0.577, 5s auc is 0.633, 10s auc is 0.650, 18s auc is 0.674
+Epoch 58 val loss is 2.289, scene 2, click auc is 0.693, like auc is 0.706, follow auc is 0.730, 5s auc is 0.682, 10s auc is 0.698, 18s auc is 0.718
+Epoch 58 val loss is 2.289, scene 3, click auc is 0.700, like auc is 0.705, follow auc is 0.715, 5s auc is 0.701, 10s auc is 0.712, 18s auc is 0.726
+Epoch 58 val loss is 2.289, scene 4, click auc is 0.679, like auc is 0.681, follow auc is 0.749, 5s auc is 0.673, 10s auc is 0.685, 18s auc is 0.685
+Epoch 59 train loss is 2.285, total scene, click auc is 0.765, like auc is 0.752, follow auc is 0.787, 5s auc is 0.771, 10s auc is 0.770, 18s auc is 0.781
+Epoch 59 val loss is 2.348, total scene, click auc is 0.747, like auc is 0.728, follow auc is 0.755, 5s auc is 0.754, 10s auc is 0.752, 18s auc is 0.761
+Epoch 59 val loss is 2.285, scene 1, click auc is 0.617, like auc is 0.616, follow auc is 0.555, 5s auc is 0.635, 10s auc is 0.651, 18s auc is 0.674
+Epoch 59 val loss is 2.285, scene 2, click auc is 0.693, like auc is 0.708, follow auc is 0.734, 5s auc is 0.684, 10s auc is 0.698, 18s auc is 0.719
+Epoch 59 val loss is 2.285, scene 3, click auc is 0.701, like auc is 0.705, follow auc is 0.710, 5s auc is 0.702, 10s auc is 0.712, 18s auc is 0.727
+Epoch 59 val loss is 2.285, scene 4, click auc is 0.680, like auc is 0.686, follow auc is 0.732, 5s auc is 0.675, 10s auc is 0.686, 18s auc is 0.686
+Epoch 60 train loss is 2.282, total scene, click auc is 0.766, like auc is 0.753, follow auc is 0.788, 5s auc is 0.772, 10s auc is 0.771, 18s auc is 0.782
+Epoch 60 val loss is 2.346, total scene, click auc is 0.748, like auc is 0.728, follow auc is 0.754, 5s auc is 0.755, 10s auc is 0.752, 18s auc is 0.762
+Epoch 60 val loss is 2.282, scene 1, click auc is 0.618, like auc is 0.623, follow auc is 0.567, 5s auc is 0.636, 10s auc is 0.652, 18s auc is 0.676
+Epoch 60 val loss is 2.282, scene 2, click auc is 0.694, like auc is 0.708, follow auc is 0.733, 5s auc is 0.685, 10s auc is 0.700, 18s auc is 0.720
+Epoch 60 val loss is 2.282, scene 3, click auc is 0.702, like auc is 0.706, follow auc is 0.711, 5s auc is 0.703, 10s auc is 0.714, 18s auc is 0.729
+Epoch 60 val loss is 2.282, scene 4, click auc is 0.682, like auc is 0.687, follow auc is 0.744, 5s auc is 0.676, 10s auc is 0.687, 18s auc is 0.687
+Epoch 61 train loss is 2.278, total scene, click auc is 0.767, like auc is 0.754, follow auc is 0.788, 5s auc is 0.773, 10s auc is 0.772, 18s auc is 0.783
+Epoch 61 val loss is 2.345, total scene, click auc is 0.749, like auc is 0.729, follow auc is 0.755, 5s auc is 0.755, 10s auc is 0.753, 18s auc is 0.763
+Epoch 61 val loss is 2.278, scene 1, click auc is 0.619, like auc is 0.624, follow auc is 0.639, 5s auc is 0.637, 10s auc is 0.653, 18s auc is 0.676
+Epoch 61 val loss is 2.278, scene 2, click auc is 0.696, like auc is 0.710, follow auc is 0.734, 5s auc is 0.685, 10s auc is 0.700, 18s auc is 0.721
+Epoch 61 val loss is 2.278, scene 3, click auc is 0.702, like auc is 0.708, follow auc is 0.713, 5s auc is 0.705, 10s auc is 0.715, 18s auc is 0.729
+Epoch 61 val loss is 2.278, scene 4, click auc is 0.683, like auc is 0.690, follow auc is 0.771, 5s auc is 0.677, 10s auc is 0.689, 18s auc is 0.689
+Epoch 62 train loss is 2.275, total scene, click auc is 0.768, like auc is 0.756, follow auc is 0.791, 5s auc is 0.774, 10s auc is 0.773, 18s auc is 0.784
+Epoch 62 val loss is 2.341, total scene, click auc is 0.750, like auc is 0.731, follow auc is 0.756, 5s auc is 0.756, 10s auc is 0.754, 18s auc is 0.763
+Epoch 62 val loss is 2.275, scene 1, click auc is 0.621, like auc is 0.626, follow auc is 0.628, 5s auc is 0.640, 10s auc is 0.656, 18s auc is 0.678
+Epoch 62 val loss is 2.275, scene 2, click auc is 0.697, like auc is 0.713, follow auc is 0.736, 5s auc is 0.687, 10s auc is 0.701, 18s auc is 0.722
+Epoch 62 val loss is 2.275, scene 3, click auc is 0.704, like auc is 0.705, follow auc is 0.713, 5s auc is 0.705, 10s auc is 0.716, 18s auc is 0.730
+Epoch 62 val loss is 2.275, scene 4, click auc is 0.684, like auc is 0.690, follow auc is 0.751, 5s auc is 0.679, 10s auc is 0.690, 18s auc is 0.690
+Epoch 63 train loss is 2.272, total scene, click auc is 0.769, like auc is 0.757, follow auc is 0.793, 5s auc is 0.775, 10s auc is 0.774, 18s auc is 0.785
+Epoch 63 val loss is 2.340, total scene, click auc is 0.750, like auc is 0.732, follow auc is 0.758, 5s auc is 0.757, 10s auc is 0.755, 18s auc is 0.764
+Epoch 63 val loss is 2.272, scene 1, click auc is 0.623, like auc is 0.628, follow auc is 0.582, 5s auc is 0.640, 10s auc is 0.657, 18s auc is 0.679
+Epoch 63 val loss is 2.272, scene 2, click auc is 0.697, like auc is 0.713, follow auc is 0.739, 5s auc is 0.687, 10s auc is 0.702, 18s auc is 0.723
+Epoch 63 val loss is 2.272, scene 3, click auc is 0.705, like auc is 0.710, follow auc is 0.708, 5s auc is 0.707, 10s auc is 0.717, 18s auc is 0.732
+Epoch 63 val loss is 2.272, scene 4, click auc is 0.685, like auc is 0.690, follow auc is 0.743, 5s auc is 0.679, 10s auc is 0.691, 18s auc is 0.691
+Epoch 64 train loss is 2.269, total scene, click auc is 0.770, like auc is 0.759, follow auc is 0.792, 5s auc is 0.776, 10s auc is 0.775, 18s auc is 0.786
+Epoch 64 val loss is 2.335, total scene, click auc is 0.751, like auc is 0.732, follow auc is 0.758, 5s auc is 0.757, 10s auc is 0.755, 18s auc is 0.765
+Epoch 64 val loss is 2.269, scene 1, click auc is 0.623, like auc is 0.633, follow auc is 0.589, 5s auc is 0.641, 10s auc is 0.658, 18s auc is 0.678
+Epoch 64 val loss is 2.269, scene 2, click auc is 0.698, like auc is 0.714, follow auc is 0.737, 5s auc is 0.688, 10s auc is 0.703, 18s auc is 0.724
+Epoch 64 val loss is 2.269, scene 3, click auc is 0.706, like auc is 0.708, follow auc is 0.716, 5s auc is 0.708, 10s auc is 0.718, 18s auc is 0.733
+Epoch 64 val loss is 2.269, scene 4, click auc is 0.686, like auc is 0.692, follow auc is 0.752, 5s auc is 0.680, 10s auc is 0.692, 18s auc is 0.692
+Epoch 65 train loss is 2.265, total scene, click auc is 0.771, like auc is 0.760, follow auc is 0.792, 5s auc is 0.776, 10s auc is 0.776, 18s auc is 0.787
+Epoch 65 val loss is 2.335, total scene, click auc is 0.752, like auc is 0.734, follow auc is 0.760, 5s auc is 0.758, 10s auc is 0.756, 18s auc is 0.765
+Epoch 65 val loss is 2.265, scene 1, click auc is 0.624, like auc is 0.632, follow auc is 0.592, 5s auc is 0.643, 10s auc is 0.658, 18s auc is 0.682
+Epoch 65 val loss is 2.265, scene 2, click auc is 0.699, like auc is 0.715, follow auc is 0.739, 5s auc is 0.689, 10s auc is 0.704, 18s auc is 0.724
+Epoch 65 val loss is 2.265, scene 3, click auc is 0.707, like auc is 0.714, follow auc is 0.718, 5s auc is 0.709, 10s auc is 0.719, 18s auc is 0.733
+Epoch 65 val loss is 2.265, scene 4, click auc is 0.687, like auc is 0.692, follow auc is 0.764, 5s auc is 0.681, 10s auc is 0.693, 18s auc is 0.693
+Epoch 66 train loss is 2.262, total scene, click auc is 0.772, like auc is 0.761, follow auc is 0.793, 5s auc is 0.777, 10s auc is 0.777, 18s auc is 0.788
+Epoch 66 val loss is 2.333, total scene, click auc is 0.752, like auc is 0.735, follow auc is 0.759, 5s auc is 0.759, 10s auc is 0.756, 18s auc is 0.766
+Epoch 66 val loss is 2.262, scene 1, click auc is 0.627, like auc is 0.633, follow auc is 0.641, 5s auc is 0.644, 10s auc is 0.660, 18s auc is 0.681
+Epoch 66 val loss is 2.262, scene 2, click auc is 0.700, like auc is 0.717, follow auc is 0.737, 5s auc is 0.690, 10s auc is 0.705, 18s auc is 0.725
+Epoch 66 val loss is 2.262, scene 3, click auc is 0.707, like auc is 0.713, follow auc is 0.720, 5s auc is 0.710, 10s auc is 0.720, 18s auc is 0.734
+Epoch 66 val loss is 2.262, scene 4, click auc is 0.688, like auc is 0.694, follow auc is 0.753, 5s auc is 0.683, 10s auc is 0.694, 18s auc is 0.694
+Epoch 67 train loss is 2.259, total scene, click auc is 0.773, like auc is 0.762, follow auc is 0.793, 5s auc is 0.778, 10s auc is 0.777, 18s auc is 0.788
+Epoch 67 val loss is 2.331, total scene, click auc is 0.753, like auc is 0.737, follow auc is 0.760, 5s auc is 0.759, 10s auc is 0.757, 18s auc is 0.767
+Epoch 67 val loss is 2.259, scene 1, click auc is 0.627, like auc is 0.631, follow auc is 0.591, 5s auc is 0.645, 10s auc is 0.662, 18s auc is 0.683
+Epoch 67 val loss is 2.259, scene 2, click auc is 0.701, like auc is 0.719, follow auc is 0.739, 5s auc is 0.691, 10s auc is 0.705, 18s auc is 0.726
+Epoch 67 val loss is 2.259, scene 3, click auc is 0.708, like auc is 0.716, follow auc is 0.712, 5s auc is 0.711, 10s auc is 0.720, 18s auc is 0.734
+Epoch 67 val loss is 2.259, scene 4, click auc is 0.689, like auc is 0.695, follow auc is 0.744, 5s auc is 0.683, 10s auc is 0.695, 18s auc is 0.695
+Epoch 68 train loss is 2.256, total scene, click auc is 0.774, like auc is 0.763, follow auc is 0.795, 5s auc is 0.779, 10s auc is 0.778, 18s auc is 0.789
+Epoch 68 val loss is 2.330, total scene, click auc is 0.754, like auc is 0.738, follow auc is 0.761, 5s auc is 0.760, 10s auc is 0.758, 18s auc is 0.767
+Epoch 68 val loss is 2.256, scene 1, click auc is 0.629, like auc is 0.633, follow auc is 0.609, 5s auc is 0.646, 10s auc is 0.662, 18s auc is 0.683
+Epoch 68 val loss is 2.256, scene 2, click auc is 0.702, like auc is 0.720, follow auc is 0.740, 5s auc is 0.692, 10s auc is 0.706, 18s auc is 0.727
+Epoch 68 val loss is 2.256, scene 3, click auc is 0.709, like auc is 0.714, follow auc is 0.716, 5s auc is 0.711, 10s auc is 0.722, 18s auc is 0.735
+Epoch 68 val loss is 2.256, scene 4, click auc is 0.691, like auc is 0.695, follow auc is 0.761, 5s auc is 0.685, 10s auc is 0.696, 18s auc is 0.696
+Epoch 69 train loss is 2.253, total scene, click auc is 0.774, like auc is 0.765, follow auc is 0.796, 5s auc is 0.780, 10s auc is 0.779, 18s auc is 0.790
+Epoch 69 val loss is 2.327, total scene, click auc is 0.754, like auc is 0.738, follow auc is 0.762, 5s auc is 0.761, 10s auc is 0.758, 18s auc is 0.768
+Epoch 69 val loss is 2.253, scene 1, click auc is 0.629, like auc is 0.636, follow auc is 0.642, 5s auc is 0.647, 10s auc is 0.663, 18s auc is 0.685
+Epoch 69 val loss is 2.253, scene 2, click auc is 0.702, like auc is 0.721, follow auc is 0.741, 5s auc is 0.693, 10s auc is 0.707, 18s auc is 0.727
+Epoch 69 val loss is 2.253, scene 3, click auc is 0.710, like auc is 0.715, follow auc is 0.716, 5s auc is 0.713, 10s auc is 0.723, 18s auc is 0.737
+Epoch 69 val loss is 2.253, scene 4, click auc is 0.691, like auc is 0.697, follow auc is 0.748, 5s auc is 0.685, 10s auc is 0.697, 18s auc is 0.697
+Epoch 70 train loss is 2.250, total scene, click auc is 0.775, like auc is 0.766, follow auc is 0.795, 5s auc is 0.780, 10s auc is 0.780, 18s auc is 0.791
+Epoch 70 val loss is 2.327, total scene, click auc is 0.755, like auc is 0.739, follow auc is 0.758, 5s auc is 0.761, 10s auc is 0.759, 18s auc is 0.768
+Epoch 70 val loss is 2.250, scene 1, click auc is 0.630, like auc is 0.636, follow auc is 0.616, 5s auc is 0.648, 10s auc is 0.664, 18s auc is 0.685
+Epoch 70 val loss is 2.250, scene 2, click auc is 0.703, like auc is 0.722, follow auc is 0.737, 5s auc is 0.693, 10s auc is 0.708, 18s auc is 0.728
+Epoch 70 val loss is 2.250, scene 3, click auc is 0.711, like auc is 0.718, follow auc is 0.717, 5s auc is 0.713, 10s auc is 0.723, 18s auc is 0.737
+Epoch 70 val loss is 2.250, scene 4, click auc is 0.691, like auc is 0.697, follow auc is 0.757, 5s auc is 0.686, 10s auc is 0.698, 18s auc is 0.698
+Epoch 71 train loss is 2.248, total scene, click auc is 0.776, like auc is 0.767, follow auc is 0.796, 5s auc is 0.781, 10s auc is 0.781, 18s auc is 0.791
+Epoch 71 val loss is 2.325, total scene, click auc is 0.755, like auc is 0.741, follow auc is 0.759, 5s auc is 0.762, 10s auc is 0.759, 18s auc is 0.769
+Epoch 71 val loss is 2.248, scene 1, click auc is 0.632, like auc is 0.638, follow auc is 0.617, 5s auc is 0.650, 10s auc is 0.665, 18s auc is 0.686
+Epoch 71 val loss is 2.248, scene 2, click auc is 0.704, like auc is 0.724, follow auc is 0.737, 5s auc is 0.694, 10s auc is 0.708, 18s auc is 0.729
+Epoch 71 val loss is 2.248, scene 3, click auc is 0.711, like auc is 0.720, follow auc is 0.718, 5s auc is 0.714, 10s auc is 0.724, 18s auc is 0.737
+Epoch 71 val loss is 2.248, scene 4, click auc is 0.693, like auc is 0.698, follow auc is 0.772, 5s auc is 0.687, 10s auc is 0.698, 18s auc is 0.698
+Epoch 72 train loss is 2.245, total scene, click auc is 0.777, like auc is 0.768, follow auc is 0.798, 5s auc is 0.782, 10s auc is 0.781, 18s auc is 0.792
+Epoch 72 val loss is 2.323, total scene, click auc is 0.756, like auc is 0.742, follow auc is 0.759, 5s auc is 0.762, 10s auc is 0.760, 18s auc is 0.770
+Epoch 72 val loss is 2.245, scene 1, click auc is 0.633, like auc is 0.645, follow auc is 0.632, 5s auc is 0.651, 10s auc is 0.666, 18s auc is 0.687
+Epoch 72 val loss is 2.245, scene 2, click auc is 0.705, like auc is 0.725, follow auc is 0.737, 5s auc is 0.695, 10s auc is 0.709, 18s auc is 0.729
+Epoch 72 val loss is 2.245, scene 3, click auc is 0.713, like auc is 0.719, follow auc is 0.718, 5s auc is 0.715, 10s auc is 0.725, 18s auc is 0.739
+Epoch 72 val loss is 2.245, scene 4, click auc is 0.694, like auc is 0.700, follow auc is 0.758, 5s auc is 0.688, 10s auc is 0.700, 18s auc is 0.700
+Epoch 73 train loss is 2.242, total scene, click auc is 0.777, like auc is 0.769, follow auc is 0.798, 5s auc is 0.782, 10s auc is 0.782, 18s auc is 0.793
+Epoch 73 val loss is 2.322, total scene, click auc is 0.757, like auc is 0.744, follow auc is 0.762, 5s auc is 0.763, 10s auc is 0.760, 18s auc is 0.770
+Epoch 73 val loss is 2.242, scene 1, click auc is 0.634, like auc is 0.640, follow auc is 0.625, 5s auc is 0.652, 10s auc is 0.667, 18s auc is 0.688
+Epoch 73 val loss is 2.242, scene 2, click auc is 0.705, like auc is 0.727, follow auc is 0.743, 5s auc is 0.695, 10s auc is 0.710, 18s auc is 0.730
+Epoch 73 val loss is 2.242, scene 3, click auc is 0.713, like auc is 0.719, follow auc is 0.717, 5s auc is 0.716, 10s auc is 0.726, 18s auc is 0.739
+Epoch 73 val loss is 2.242, scene 4, click auc is 0.695, like auc is 0.700, follow auc is 0.750, 5s auc is 0.689, 10s auc is 0.700, 18s auc is 0.700
+Epoch 74 train loss is 2.240, total scene, click auc is 0.778, like auc is 0.770, follow auc is 0.797, 5s auc is 0.783, 10s auc is 0.783, 18s auc is 0.794
+Epoch 74 val loss is 2.319, total scene, click auc is 0.757, like auc is 0.744, follow auc is 0.762, 5s auc is 0.763, 10s auc is 0.761, 18s auc is 0.770
+Epoch 74 val loss is 2.240, scene 1, click auc is 0.635, like auc is 0.643, follow auc is 0.660, 5s auc is 0.653, 10s auc is 0.668, 18s auc is 0.688
+Epoch 74 val loss is 2.240, scene 2, click auc is 0.706, like auc is 0.727, follow auc is 0.742, 5s auc is 0.696, 10s auc is 0.710, 18s auc is 0.730
+Epoch 74 val loss is 2.240, scene 3, click auc is 0.714, like auc is 0.722, follow auc is 0.715, 5s auc is 0.717, 10s auc is 0.727, 18s auc is 0.740
+Epoch 74 val loss is 2.240, scene 4, click auc is 0.695, like auc is 0.698, follow auc is 0.752, 5s auc is 0.690, 10s auc is 0.701, 18s auc is 0.701
+Epoch 75 train loss is 2.237, total scene, click auc is 0.779, like auc is 0.772, follow auc is 0.799, 5s auc is 0.784, 10s auc is 0.783, 18s auc is 0.794
+Epoch 75 val loss is 2.319, total scene, click auc is 0.758, like auc is 0.745, follow auc is 0.764, 5s auc is 0.764, 10s auc is 0.761, 18s auc is 0.771
+Epoch 75 val loss is 2.237, scene 1, click auc is 0.635, like auc is 0.642, follow auc is 0.617, 5s auc is 0.654, 10s auc is 0.669, 18s auc is 0.689
+Epoch 75 val loss is 2.237, scene 2, click auc is 0.707, like auc is 0.729, follow auc is 0.744, 5s auc is 0.697, 10s auc is 0.711, 18s auc is 0.731
+Epoch 75 val loss is 2.237, scene 3, click auc is 0.714, like auc is 0.725, follow auc is 0.718, 5s auc is 0.717, 10s auc is 0.727, 18s auc is 0.741
+Epoch 75 val loss is 2.237, scene 4, click auc is 0.696, like auc is 0.701, follow auc is 0.766, 5s auc is 0.690, 10s auc is 0.702, 18s auc is 0.702
+Epoch 76 train loss is 2.235, total scene, click auc is 0.779, like auc is 0.773, follow auc is 0.799, 5s auc is 0.784, 10s auc is 0.784, 18s auc is 0.795
+Epoch 76 val loss is 2.318, total scene, click auc is 0.758, like auc is 0.746, follow auc is 0.763, 5s auc is 0.764, 10s auc is 0.762, 18s auc is 0.771
+Epoch 76 val loss is 2.235, scene 1, click auc is 0.636, like auc is 0.645, follow auc is 0.637, 5s auc is 0.654, 10s auc is 0.669, 18s auc is 0.689
+Epoch 76 val loss is 2.235, scene 2, click auc is 0.707, like auc is 0.730, follow auc is 0.741, 5s auc is 0.697, 10s auc is 0.711, 18s auc is 0.732
+Epoch 76 val loss is 2.235, scene 3, click auc is 0.715, like auc is 0.724, follow auc is 0.717, 5s auc is 0.718, 10s auc is 0.728, 18s auc is 0.741
+Epoch 76 val loss is 2.235, scene 4, click auc is 0.697, like auc is 0.702, follow auc is 0.766, 5s auc is 0.691, 10s auc is 0.702, 18s auc is 0.702
+Epoch 77 train loss is 2.233, total scene, click auc is 0.780, like auc is 0.774, follow auc is 0.801, 5s auc is 0.785, 10s auc is 0.785, 18s auc is 0.795
+Epoch 77 val loss is 2.315, total scene, click auc is 0.758, like auc is 0.748, follow auc is 0.763, 5s auc is 0.764, 10s auc is 0.762, 18s auc is 0.772
+Epoch 77 val loss is 2.233, scene 1, click auc is 0.637, like auc is 0.645, follow auc is 0.646, 5s auc is 0.655, 10s auc is 0.670, 18s auc is 0.691
+Epoch 77 val loss is 2.233, scene 2, click auc is 0.708, like auc is 0.731, follow auc is 0.745, 5s auc is 0.698, 10s auc is 0.712, 18s auc is 0.732
+Epoch 77 val loss is 2.233, scene 3, click auc is 0.716, like auc is 0.724, follow auc is 0.717, 5s auc is 0.719, 10s auc is 0.729, 18s auc is 0.743
+Epoch 77 val loss is 2.233, scene 4, click auc is 0.697, like auc is 0.705, follow auc is 0.742, 5s auc is 0.691, 10s auc is 0.703, 18s auc is 0.703
+Epoch 78 train loss is 2.230, total scene, click auc is 0.781, like auc is 0.775, follow auc is 0.801, 5s auc is 0.786, 10s auc is 0.785, 18s auc is 0.796
+Epoch 78 val loss is 2.314, total scene, click auc is 0.759, like auc is 0.748, follow auc is 0.764, 5s auc is 0.765, 10s auc is 0.763, 18s auc is 0.772
+Epoch 78 val loss is 2.230, scene 1, click auc is 0.638, like auc is 0.650, follow auc is 0.639, 5s auc is 0.656, 10s auc is 0.671, 18s auc is 0.691
+Epoch 78 val loss is 2.230, scene 2, click auc is 0.708, like auc is 0.732, follow auc is 0.744, 5s auc is 0.698, 10s auc is 0.712, 18s auc is 0.733
+Epoch 78 val loss is 2.230, scene 3, click auc is 0.716, like auc is 0.725, follow auc is 0.716, 5s auc is 0.719, 10s auc is 0.729, 18s auc is 0.742
+Epoch 78 val loss is 2.230, scene 4, click auc is 0.698, like auc is 0.703, follow auc is 0.763, 5s auc is 0.692, 10s auc is 0.704, 18s auc is 0.704
+Epoch 79 train loss is 2.228, total scene, click auc is 0.781, like auc is 0.776, follow auc is 0.801, 5s auc is 0.786, 10s auc is 0.786, 18s auc is 0.797
+Epoch 79 val loss is 2.313, total scene, click auc is 0.759, like auc is 0.749, follow auc is 0.764, 5s auc is 0.765, 10s auc is 0.763, 18s auc is 0.773
+Epoch 79 val loss is 2.228, scene 1, click auc is 0.639, like auc is 0.649, follow auc is 0.639, 5s auc is 0.657, 10s auc is 0.672, 18s auc is 0.692
+Epoch 79 val loss is 2.228, scene 2, click auc is 0.709, like auc is 0.733, follow auc is 0.744, 5s auc is 0.699, 10s auc is 0.713, 18s auc is 0.733
+Epoch 79 val loss is 2.228, scene 3, click auc is 0.717, like auc is 0.726, follow auc is 0.723, 5s auc is 0.720, 10s auc is 0.730, 18s auc is 0.744
+Epoch 79 val loss is 2.228, scene 4, click auc is 0.699, like auc is 0.705, follow auc is 0.754, 5s auc is 0.693, 10s auc is 0.704, 18s auc is 0.704
+Epoch 80 train loss is 2.226, total scene, click auc is 0.782, like auc is 0.777, follow auc is 0.801, 5s auc is 0.787, 10s auc is 0.786, 18s auc is 0.797
+Epoch 80 val loss is 2.312, total scene, click auc is 0.760, like auc is 0.750, follow auc is 0.763, 5s auc is 0.766, 10s auc is 0.763, 18s auc is 0.773
+Epoch 80 val loss is 2.226, scene 1, click auc is 0.639, like auc is 0.648, follow auc is 0.645, 5s auc is 0.658, 10s auc is 0.672, 18s auc is 0.691
+Epoch 80 val loss is 2.226, scene 2, click auc is 0.710, like auc is 0.735, follow auc is 0.743, 5s auc is 0.699, 10s auc is 0.713, 18s auc is 0.734
+Epoch 80 val loss is 2.226, scene 3, click auc is 0.718, like auc is 0.727, follow auc is 0.719, 5s auc is 0.720, 10s auc is 0.730, 18s auc is 0.744
+Epoch 80 val loss is 2.226, scene 4, click auc is 0.699, like auc is 0.706, follow auc is 0.742, 5s auc is 0.694, 10s auc is 0.705, 18s auc is 0.705
+Epoch 81 train loss is 2.223, total scene, click auc is 0.782, like auc is 0.778, follow auc is 0.802, 5s auc is 0.787, 10s auc is 0.787, 18s auc is 0.798
+Epoch 81 val loss is 2.311, total scene, click auc is 0.760, like auc is 0.751, follow auc is 0.764, 5s auc is 0.766, 10s auc is 0.764, 18s auc is 0.773
+Epoch 81 val loss is 2.223, scene 1, click auc is 0.640, like auc is 0.649, follow auc is 0.623, 5s auc is 0.658, 10s auc is 0.674, 18s auc is 0.693
+Epoch 81 val loss is 2.223, scene 2, click auc is 0.710, like auc is 0.736, follow auc is 0.744, 5s auc is 0.700, 10s auc is 0.714, 18s auc is 0.734
+Epoch 81 val loss is 2.223, scene 3, click auc is 0.718, like auc is 0.728, follow auc is 0.719, 5s auc is 0.721, 10s auc is 0.731, 18s auc is 0.744
+Epoch 81 val loss is 2.223, scene 4, click auc is 0.699, like auc is 0.706, follow auc is 0.763, 5s auc is 0.694, 10s auc is 0.705, 18s auc is 0.705
+Epoch 82 train loss is 2.221, total scene, click auc is 0.783, like auc is 0.779, follow auc is 0.803, 5s auc is 0.788, 10s auc is 0.787, 18s auc is 0.798
+Epoch 82 val loss is 2.311, total scene, click auc is 0.760, like auc is 0.752, follow auc is 0.763, 5s auc is 0.766, 10s auc is 0.764, 18s auc is 0.774
+Epoch 82 val loss is 2.221, scene 1, click auc is 0.641, like auc is 0.651, follow auc is 0.660, 5s auc is 0.659, 10s auc is 0.675, 18s auc is 0.694
+Epoch 82 val loss is 2.221, scene 2, click auc is 0.711, like auc is 0.736, follow auc is 0.744, 5s auc is 0.701, 10s auc is 0.714, 18s auc is 0.735
+Epoch 82 val loss is 2.221, scene 3, click auc is 0.719, like auc is 0.730, follow auc is 0.721, 5s auc is 0.722, 10s auc is 0.731, 18s auc is 0.745
+Epoch 82 val loss is 2.221, scene 4, click auc is 0.701, like auc is 0.705, follow auc is 0.739, 5s auc is 0.695, 10s auc is 0.706, 18s auc is 0.706
+Epoch 83 train loss is 2.219, total scene, click auc is 0.783, like auc is 0.780, follow auc is 0.804, 5s auc is 0.788, 10s auc is 0.788, 18s auc is 0.799
+Epoch 83 val loss is 2.308, total scene, click auc is 0.761, like auc is 0.753, follow auc is 0.764, 5s auc is 0.767, 10s auc is 0.764, 18s auc is 0.774
+Epoch 83 val loss is 2.219, scene 1, click auc is 0.642, like auc is 0.648, follow auc is 0.649, 5s auc is 0.660, 10s auc is 0.675, 18s auc is 0.694
+Epoch 83 val loss is 2.219, scene 2, click auc is 0.711, like auc is 0.738, follow auc is 0.743, 5s auc is 0.701, 10s auc is 0.715, 18s auc is 0.735
+Epoch 83 val loss is 2.219, scene 3, click auc is 0.720, like auc is 0.730, follow auc is 0.720, 5s auc is 0.723, 10s auc is 0.732, 18s auc is 0.745
+Epoch 83 val loss is 2.219, scene 4, click auc is 0.701, like auc is 0.708, follow auc is 0.760, 5s auc is 0.695, 10s auc is 0.706, 18s auc is 0.706
+Epoch 84 train loss is 2.217, total scene, click auc is 0.784, like auc is 0.781, follow auc is 0.804, 5s auc is 0.789, 10s auc is 0.788, 18s auc is 0.799
+Epoch 84 val loss is 2.308, total scene, click auc is 0.761, like auc is 0.754, follow auc is 0.765, 5s auc is 0.767, 10s auc is 0.765, 18s auc is 0.775
+Epoch 84 val loss is 2.217, scene 1, click auc is 0.642, like auc is 0.652, follow auc is 0.656, 5s auc is 0.661, 10s auc is 0.675, 18s auc is 0.694
+Epoch 84 val loss is 2.217, scene 2, click auc is 0.711, like auc is 0.740, follow auc is 0.745, 5s auc is 0.701, 10s auc is 0.715, 18s auc is 0.736
+Epoch 84 val loss is 2.217, scene 3, click auc is 0.720, like auc is 0.733, follow auc is 0.722, 5s auc is 0.723, 10s auc is 0.733, 18s auc is 0.746
+Epoch 84 val loss is 2.217, scene 4, click auc is 0.701, like auc is 0.709, follow auc is 0.748, 5s auc is 0.696, 10s auc is 0.707, 18s auc is 0.707
+Epoch 85 train loss is 2.215, total scene, click auc is 0.784, like auc is 0.782, follow auc is 0.804, 5s auc is 0.789, 10s auc is 0.789, 18s auc is 0.800
+Epoch 85 val loss is 2.307, total scene, click auc is 0.762, like auc is 0.755, follow auc is 0.763, 5s auc is 0.767, 10s auc is 0.765, 18s auc is 0.775
+Epoch 85 val loss is 2.215, scene 1, click auc is 0.643, like auc is 0.653, follow auc is 0.641, 5s auc is 0.661, 10s auc is 0.676, 18s auc is 0.696
+Epoch 85 val loss is 2.215, scene 2, click auc is 0.712, like auc is 0.739, follow auc is 0.742, 5s auc is 0.702, 10s auc is 0.716, 18s auc is 0.736
+Epoch 85 val loss is 2.215, scene 3, click auc is 0.721, like auc is 0.732, follow auc is 0.718, 5s auc is 0.723, 10s auc is 0.733, 18s auc is 0.747
+Epoch 85 val loss is 2.215, scene 4, click auc is 0.703, like auc is 0.710, follow auc is 0.760, 5s auc is 0.696, 10s auc is 0.707, 18s auc is 0.707
+Epoch 86 train loss is 2.213, total scene, click auc is 0.785, like auc is 0.783, follow auc is 0.806, 5s auc is 0.790, 10s auc is 0.789, 18s auc is 0.800
+Epoch 86 val loss is 2.305, total scene, click auc is 0.762, like auc is 0.755, follow auc is 0.767, 5s auc is 0.768, 10s auc is 0.765, 18s auc is 0.775
+Epoch 86 val loss is 2.213, scene 1, click auc is 0.643, like auc is 0.655, follow auc is 0.616, 5s auc is 0.661, 10s auc is 0.676, 18s auc is 0.695
+Epoch 86 val loss is 2.213, scene 2, click auc is 0.712, like auc is 0.740, follow auc is 0.748, 5s auc is 0.702, 10s auc is 0.716, 18s auc is 0.736
+Epoch 86 val loss is 2.213, scene 3, click auc is 0.721, like auc is 0.731, follow auc is 0.719, 5s auc is 0.724, 10s auc is 0.733, 18s auc is 0.747
+Epoch 86 val loss is 2.213, scene 4, click auc is 0.702, like auc is 0.710, follow auc is 0.753, 5s auc is 0.697, 10s auc is 0.708, 18s auc is 0.708
+Epoch 87 train loss is 2.211, total scene, click auc is 0.785, like auc is 0.784, follow auc is 0.805, 5s auc is 0.790, 10s auc is 0.790, 18s auc is 0.801
+Epoch 87 val loss is 2.305, total scene, click auc is 0.762, like auc is 0.757, follow auc is 0.764, 5s auc is 0.768, 10s auc is 0.766, 18s auc is 0.775
+Epoch 87 val loss is 2.211, scene 1, click auc is 0.644, like auc is 0.653, follow auc is 0.663, 5s auc is 0.662, 10s auc is 0.677, 18s auc is 0.697
+Epoch 87 val loss is 2.211, scene 2, click auc is 0.713, like auc is 0.742, follow auc is 0.745, 5s auc is 0.703, 10s auc is 0.716, 18s auc is 0.737
+Epoch 87 val loss is 2.211, scene 3, click auc is 0.722, like auc is 0.734, follow auc is 0.719, 5s auc is 0.725, 10s auc is 0.734, 18s auc is 0.747
+Epoch 87 val loss is 2.211, scene 4, click auc is 0.703, like auc is 0.709, follow auc is 0.754, 5s auc is 0.697, 10s auc is 0.708, 18s auc is 0.708
+Epoch 88 train loss is 2.209, total scene, click auc is 0.786, like auc is 0.785, follow auc is 0.807, 5s auc is 0.791, 10s auc is 0.790, 18s auc is 0.801
+Epoch 88 val loss is 2.302, total scene, click auc is 0.762, like auc is 0.758, follow auc is 0.764, 5s auc is 0.768, 10s auc is 0.766, 18s auc is 0.776
+Epoch 88 val loss is 2.209, scene 1, click auc is 0.645, like auc is 0.656, follow auc is 0.649, 5s auc is 0.663, 10s auc is 0.678, 18s auc is 0.698
+Epoch 88 val loss is 2.209, scene 2, click auc is 0.713, like auc is 0.743, follow auc is 0.745, 5s auc is 0.703, 10s auc is 0.717, 18s auc is 0.737
+Epoch 88 val loss is 2.209, scene 3, click auc is 0.722, like auc is 0.735, follow auc is 0.719, 5s auc is 0.725, 10s auc is 0.735, 18s auc is 0.748
+Epoch 88 val loss is 2.209, scene 4, click auc is 0.704, like auc is 0.714, follow auc is 0.749, 5s auc is 0.698, 10s auc is 0.709, 18s auc is 0.709
+Epoch 89 train loss is 2.207, total scene, click auc is 0.786, like auc is 0.786, follow auc is 0.806, 5s auc is 0.791, 10s auc is 0.791, 18s auc is 0.802
+Epoch 89 val loss is 2.302, total scene, click auc is 0.763, like auc is 0.758, follow auc is 0.765, 5s auc is 0.769, 10s auc is 0.766, 18s auc is 0.776
+Epoch 89 val loss is 2.207, scene 1, click auc is 0.645, like auc is 0.656, follow auc is 0.642, 5s auc is 0.663, 10s auc is 0.678, 18s auc is 0.698
+Epoch 89 val loss is 2.207, scene 2, click auc is 0.714, like auc is 0.743, follow auc is 0.747, 5s auc is 0.703, 10s auc is 0.717, 18s auc is 0.738
+Epoch 89 val loss is 2.207, scene 3, click auc is 0.722, like auc is 0.733, follow auc is 0.722, 5s auc is 0.726, 10s auc is 0.736, 18s auc is 0.748
+Epoch 89 val loss is 2.207, scene 4, click auc is 0.704, like auc is 0.712, follow auc is 0.746, 5s auc is 0.698, 10s auc is 0.709, 18s auc is 0.709
+Epoch 90 train loss is 2.206, total scene, click auc is 0.787, like auc is 0.787, follow auc is 0.807, 5s auc is 0.792, 10s auc is 0.791, 18s auc is 0.802
+Epoch 90 val loss is 2.302, total scene, click auc is 0.763, like auc is 0.759, follow auc is 0.764, 5s auc is 0.769, 10s auc is 0.767, 18s auc is 0.777
+Epoch 90 val loss is 2.206, scene 1, click auc is 0.645, like auc is 0.657, follow auc is 0.649, 5s auc is 0.664, 10s auc is 0.679, 18s auc is 0.698
+Epoch 90 val loss is 2.206, scene 2, click auc is 0.714, like auc is 0.745, follow auc is 0.746, 5s auc is 0.704, 10s auc is 0.717, 18s auc is 0.738
+Epoch 90 val loss is 2.206, scene 3, click auc is 0.722, like auc is 0.734, follow auc is 0.713, 5s auc is 0.726, 10s auc is 0.735, 18s auc is 0.749
+Epoch 90 val loss is 2.206, scene 4, click auc is 0.705, like auc is 0.715, follow auc is 0.743, 5s auc is 0.699, 10s auc is 0.710, 18s auc is 0.710
+Epoch 91 train loss is 2.204, total scene, click auc is 0.787, like auc is 0.788, follow auc is 0.808, 5s auc is 0.792, 10s auc is 0.792, 18s auc is 0.803
+Epoch 91 val loss is 2.301, total scene, click auc is 0.763, like auc is 0.760, follow auc is 0.764, 5s auc is 0.769, 10s auc is 0.767, 18s auc is 0.777
+Epoch 91 val loss is 2.204, scene 1, click auc is 0.646, like auc is 0.659, follow auc is 0.636, 5s auc is 0.664, 10s auc is 0.679, 18s auc is 0.698
+Epoch 91 val loss is 2.204, scene 2, click auc is 0.714, like auc is 0.746, follow auc is 0.744, 5s auc is 0.704, 10s auc is 0.718, 18s auc is 0.738
+Epoch 91 val loss is 2.204, scene 3, click auc is 0.723, like auc is 0.736, follow auc is 0.721, 5s auc is 0.727, 10s auc is 0.736, 18s auc is 0.750
+Epoch 91 val loss is 2.204, scene 4, click auc is 0.705, like auc is 0.714, follow auc is 0.761, 5s auc is 0.699, 10s auc is 0.710, 18s auc is 0.710
+Epoch 92 train loss is 2.202, total scene, click auc is 0.788, like auc is 0.789, follow auc is 0.808, 5s auc is 0.792, 10s auc is 0.792, 18s auc is 0.803
+Epoch 92 val loss is 2.300, total scene, click auc is 0.764, like auc is 0.761, follow auc is 0.765, 5s auc is 0.769, 10s auc is 0.767, 18s auc is 0.777
+Epoch 92 val loss is 2.202, scene 1, click auc is 0.647, like auc is 0.660, follow auc is 0.668, 5s auc is 0.665, 10s auc is 0.679, 18s auc is 0.698
+Epoch 92 val loss is 2.202, scene 2, click auc is 0.715, like auc is 0.747, follow auc is 0.744, 5s auc is 0.705, 10s auc is 0.718, 18s auc is 0.738
+Epoch 92 val loss is 2.202, scene 3, click auc is 0.724, like auc is 0.736, follow auc is 0.715, 5s auc is 0.727, 10s auc is 0.737, 18s auc is 0.750
+Epoch 92 val loss is 2.202, scene 4, click auc is 0.705, like auc is 0.715, follow auc is 0.764, 5s auc is 0.699, 10s auc is 0.710, 18s auc is 0.710
+Epoch 93 train loss is 2.201, total scene, click auc is 0.788, like auc is 0.790, follow auc is 0.809, 5s auc is 0.793, 10s auc is 0.792, 18s auc is 0.803
+Epoch 93 val loss is 2.299, total scene, click auc is 0.764, like auc is 0.762, follow auc is 0.767, 5s auc is 0.770, 10s auc is 0.767, 18s auc is 0.777
+Epoch 93 val loss is 2.201, scene 1, click auc is 0.648, like auc is 0.661, follow auc is 0.646, 5s auc is 0.666, 10s auc is 0.680, 18s auc is 0.699
+Epoch 93 val loss is 2.201, scene 2, click auc is 0.715, like auc is 0.748, follow auc is 0.749, 5s auc is 0.705, 10s auc is 0.718, 18s auc is 0.739
+Epoch 93 val loss is 2.201, scene 3, click auc is 0.724, like auc is 0.735, follow auc is 0.717, 5s auc is 0.728, 10s auc is 0.737, 18s auc is 0.750
+Epoch 93 val loss is 2.201, scene 4, click auc is 0.706, like auc is 0.716, follow auc is 0.760, 5s auc is 0.700, 10s auc is 0.711, 18s auc is 0.711
+Epoch 94 train loss is 2.199, total scene, click auc is 0.788, like auc is 0.790, follow auc is 0.810, 5s auc is 0.793, 10s auc is 0.793, 18s auc is 0.804
+Epoch 94 val loss is 2.299, total scene, click auc is 0.764, like auc is 0.763, follow auc is 0.765, 5s auc is 0.770, 10s auc is 0.768, 18s auc is 0.778
+Epoch 94 val loss is 2.199, scene 1, click auc is 0.648, like auc is 0.659, follow auc is 0.644, 5s auc is 0.666, 10s auc is 0.680, 18s auc is 0.700
+Epoch 94 val loss is 2.199, scene 2, click auc is 0.715, like auc is 0.749, follow auc is 0.747, 5s auc is 0.705, 10s auc is 0.719, 18s auc is 0.739
+Epoch 94 val loss is 2.199, scene 3, click auc is 0.724, like auc is 0.737, follow auc is 0.718, 5s auc is 0.728, 10s auc is 0.738, 18s auc is 0.750
+Epoch 94 val loss is 2.199, scene 4, click auc is 0.706, like auc is 0.718, follow auc is 0.753, 5s auc is 0.700, 10s auc is 0.711, 18s auc is 0.711
+Epoch 95 train loss is 2.198, total scene, click auc is 0.789, like auc is 0.791, follow auc is 0.810, 5s auc is 0.793, 10s auc is 0.793, 18s auc is 0.804
+Epoch 95 val loss is 2.298, total scene, click auc is 0.764, like auc is 0.764, follow auc is 0.767, 5s auc is 0.770, 10s auc is 0.768, 18s auc is 0.778
+Epoch 95 val loss is 2.198, scene 1, click auc is 0.648, like auc is 0.664, follow auc is 0.643, 5s auc is 0.667, 10s auc is 0.681, 18s auc is 0.700
+Epoch 95 val loss is 2.198, scene 2, click auc is 0.716, like auc is 0.750, follow auc is 0.749, 5s auc is 0.705, 10s auc is 0.719, 18s auc is 0.740
+Epoch 95 val loss is 2.198, scene 3, click auc is 0.725, like auc is 0.736, follow auc is 0.720, 5s auc is 0.728, 10s auc is 0.738, 18s auc is 0.751
+Epoch 95 val loss is 2.198, scene 4, click auc is 0.707, like auc is 0.719, follow auc is 0.747, 5s auc is 0.701, 10s auc is 0.712, 18s auc is 0.712
+Epoch 96 train loss is 2.196, total scene, click auc is 0.789, like auc is 0.792, follow auc is 0.811, 5s auc is 0.794, 10s auc is 0.793, 18s auc is 0.805
+Epoch 96 val loss is 2.298, total scene, click auc is 0.764, like auc is 0.763, follow auc is 0.767, 5s auc is 0.770, 10s auc is 0.768, 18s auc is 0.778
+Epoch 96 val loss is 2.196, scene 1, click auc is 0.648, like auc is 0.665, follow auc is 0.639, 5s auc is 0.667, 10s auc is 0.682, 18s auc is 0.700
+Epoch 96 val loss is 2.196, scene 2, click auc is 0.716, like auc is 0.749, follow auc is 0.750, 5s auc is 0.706, 10s auc is 0.719, 18s auc is 0.740
+Epoch 96 val loss is 2.196, scene 3, click auc is 0.725, like auc is 0.736, follow auc is 0.716, 5s auc is 0.729, 10s auc is 0.738, 18s auc is 0.751
+Epoch 96 val loss is 2.196, scene 4, click auc is 0.707, like auc is 0.719, follow auc is 0.740, 5s auc is 0.701, 10s auc is 0.712, 18s auc is 0.712
+Epoch 97 train loss is 2.194, total scene, click auc is 0.790, like auc is 0.793, follow auc is 0.812, 5s auc is 0.794, 10s auc is 0.794, 18s auc is 0.805
+Epoch 97 val loss is 2.297, total scene, click auc is 0.765, like auc is 0.765, follow auc is 0.765, 5s auc is 0.771, 10s auc is 0.768, 18s auc is 0.778
+Epoch 97 val loss is 2.194, scene 1, click auc is 0.649, like auc is 0.661, follow auc is 0.652, 5s auc is 0.668, 10s auc is 0.681, 18s auc is 0.701
+Epoch 97 val loss is 2.194, scene 2, click auc is 0.716, like auc is 0.752, follow auc is 0.745, 5s auc is 0.706, 10s auc is 0.719, 18s auc is 0.740
+Epoch 97 val loss is 2.194, scene 3, click auc is 0.725, like auc is 0.740, follow auc is 0.722, 5s auc is 0.729, 10s auc is 0.739, 18s auc is 0.752
+Epoch 97 val loss is 2.194, scene 4, click auc is 0.707, like auc is 0.719, follow auc is 0.765, 5s auc is 0.702, 10s auc is 0.712, 18s auc is 0.712
+Epoch 98 train loss is 2.193, total scene, click auc is 0.790, like auc is 0.794, follow auc is 0.812, 5s auc is 0.794, 10s auc is 0.794, 18s auc is 0.805
+Epoch 98 val loss is 2.297, total scene, click auc is 0.765, like auc is 0.766, follow auc is 0.765, 5s auc is 0.771, 10s auc is 0.768, 18s auc is 0.778
+Epoch 98 val loss is 2.193, scene 1, click auc is 0.649, like auc is 0.662, follow auc is 0.640, 5s auc is 0.668, 10s auc is 0.682, 18s auc is 0.701
+Epoch 98 val loss is 2.193, scene 2, click auc is 0.716, like auc is 0.753, follow auc is 0.747, 5s auc is 0.706, 10s auc is 0.720, 18s auc is 0.740
+Epoch 98 val loss is 2.193, scene 3, click auc is 0.726, like auc is 0.740, follow auc is 0.718, 5s auc is 0.729, 10s auc is 0.739, 18s auc is 0.752
+Epoch 98 val loss is 2.193, scene 4, click auc is 0.707, like auc is 0.721, follow auc is 0.738, 5s auc is 0.702, 10s auc is 0.713, 18s auc is 0.713
+Epoch 99 train loss is 2.191, total scene, click auc is 0.790, like auc is 0.795, follow auc is 0.811, 5s auc is 0.795, 10s auc is 0.795, 18s auc is 0.806
+Epoch 99 val loss is 2.295, total scene, click auc is 0.765, like auc is 0.767, follow auc is 0.767, 5s auc is 0.771, 10s auc is 0.769, 18s auc is 0.779
+Epoch 99 val loss is 2.191, scene 1, click auc is 0.649, like auc is 0.665, follow auc is 0.659, 5s auc is 0.669, 10s auc is 0.682, 18s auc is 0.702
+Epoch 99 val loss is 2.191, scene 2, click auc is 0.717, like auc is 0.754, follow auc is 0.749, 5s auc is 0.706, 10s auc is 0.720, 18s auc is 0.741
+Epoch 99 val loss is 2.191, scene 3, click auc is 0.726, like auc is 0.740, follow auc is 0.721, 5s auc is 0.730, 10s auc is 0.739, 18s auc is 0.752
+Epoch 99 val loss is 2.191, scene 4, click auc is 0.708, like auc is 0.721, follow auc is 0.746, 5s auc is 0.702, 10s auc is 0.713, 18s auc is 0.713
+Epoch 100 train loss is 2.190, total scene, click auc is 0.791, like auc is 0.796, follow auc is 0.811, 5s auc is 0.795, 10s auc is 0.795, 18s auc is 0.806
+Epoch 100 val loss is 2.294, total scene, click auc is 0.765, like auc is 0.767, follow auc is 0.767, 5s auc is 0.771, 10s auc is 0.769, 18s auc is 0.779
+Epoch 100 val loss is 2.190, scene 1, click auc is 0.650, like auc is 0.666, follow auc is 0.673, 5s auc is 0.669, 10s auc is 0.683, 18s auc is 0.702
+Epoch 100 val loss is 2.190, scene 2, click auc is 0.717, like auc is 0.755, follow auc is 0.748, 5s auc is 0.707, 10s auc is 0.720, 18s auc is 0.741
+Epoch 100 val loss is 2.190, scene 3, click auc is 0.726, like auc is 0.739, follow auc is 0.719, 5s auc is 0.730, 10s auc is 0.740, 18s auc is 0.752
+Epoch 100 val loss is 2.190, scene 4, click auc is 0.708, like auc is 0.721, follow auc is 0.747, 5s auc is 0.702, 10s auc is 0.713, 18s auc is 0.713

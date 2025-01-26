@@ -12,11 +12,11 @@ from torch.nn import functional as F
 
 class PLE(nn.Module):
     """
-    MMOE for CTCVR problem
+    PLE for CTCVR problem
     """
 
     def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, 
-                task=['ctr', 's5', 's10', 's18', 'follow', 'like'], shared_expert=1,
+                task=['click', 'like', 'follow','_5s', '_10s', '_18s'], shared_expert=1,
                 hidden_dim=[128, 64], tower_dim = [64, 32], dropouts=0.5,
                 output_size=1, expert_activation=F.relu, device=None):
         """
@@ -128,6 +128,8 @@ class PLE(nn.Module):
                 user_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
             else:
                 user_embed_list.append(x[:, num[1]].unsqueeze(1))
+            if user_feature == 'tab':
+                scene_feature = x[:, num[1]].long() # 场景特征
         for item_feature, num in self.item_feature_dict.items():
             if num[0] > 1:
                 item_embed_list.append(getattr(self, item_feature)(x[:, num[1]].long()))
@@ -140,6 +142,7 @@ class PLE(nn.Module):
 
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size
+        print(hidden.size())
         
         # shared-expert
         share_experts = list()
@@ -185,7 +188,7 @@ class PLE(nn.Module):
             for mod in getattr(self, '{}_tower_dnn'.format(task_name)):
                 x = mod(x)
             task_outputs.append(x)
-        return task_outputs
+        return task_outputs,scene_feature
 
 
 

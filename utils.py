@@ -17,6 +17,22 @@ from model.ctr.inputs import *
 
 tqdm.pandas()
 
+
+def scene_auc(y_pred, y_true, scene_feature, tag):
+    """
+    分场景计算AUC
+    场景：{0, 1, 2, 3}
+    y_pred: 
+    y_true: 
+    scene_feature: 场景特征
+    tag : 哪个场景
+    """
+    scene_idx = np.where(scene_feature == tag)[0]
+    y_hat = y_pred[scene_idx]
+    y = y_true[scene_idx]
+    auc = roc_auc_score(y_true[scene_idx],y_pred[scene_idx])
+    return auc
+
 def select_sampler(train_data, val_data, test_data, user_count, item_count, args):
     if args.sample == 'random':
         return RandomNegativeSampler(train_data, val_data, test_data, user_count, item_count, args.negsample_size, args.seed, args.negsample_savefolder)

@@ -89,11 +89,14 @@ class MMOE(nn.Module):
         assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
         # embedding
         user_embed_list, item_embed_list = list(), list()
+        
         for user_feature, num in self.user_feature_dict.items():
             if num[0] > 1:
                 user_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
             else:
                 user_embed_list.append(x[:, num[1]].unsqueeze(1))
+            if user_feature == 'tab':
+                scene_feature = x[:, num[1]].long() # 场景特征值
         for item_feature, num in self.item_feature_dict.items():
             if num[0] > 1:
                 item_embed_list.append(getattr(self, item_feature)(x[:, num[1]].long()))
@@ -138,4 +141,4 @@ class MMOE(nn.Module):
                 x = mod(x)
             task_outputs.append(x)
 
-        return task_outputs
+        return task_outputs,scene_feature
