@@ -1,6 +1,8 @@
 import torch
+from torchsummary import summary
 import random
 import time
+import yaml
 import argparse
 from utils import *
 from trainer import *
@@ -28,6 +30,7 @@ from model.mtl.mmoe import MMOE
 from model.mtl.ple import PLE
 from model.mtl.pepnet import PEPNet
 from model.mtl.hinet import HiNet
+from model.mtl.SMANet import SMANet
 # from model.model_accelerate.stackrec import StackRec
 # from model.model_compression.cprec import CpRec
 # from model.inference_acceleration.skiprec import SkipRec, PolicyNetGumbel
@@ -357,138 +360,160 @@ def set_seed(seed, re=True):
         torch.backends.cudnn.deterministic = False
 
 if __name__ == "__main__":
+    webhook_url = "https://open.feishu.cn/open-apis/bot/v2/hook/5ac3f461-595c-496e-b75a-c50f413efede"
     parser = argparse.ArgumentParser()
-    parser.add_argument('--seed', type=int, default=0)
-    parser.add_argument('--task_name', default='')
-    parser.add_argument('--task_num', type=int, default=4)
-    parser.add_argument('--dataset_path', type=str, default='')
-    parser.add_argument('--pretrain_path', type=str, default='')
-    parser.add_argument('--source_path', type=str, default='')
-    parser.add_argument('--target_path', type=str, default='')
-    parser.add_argument('--train_batch_size', type=int, default=1024)
-    parser.add_argument('--val_batch_size', type=int, default=1024)
-    parser.add_argument('--test_batch_size', type=int, default=1024)
-    parser.add_argument('--sample', type=str, default='random')
-    parser.add_argument('--negsample_savefolder', type=str, default='./data/neg_data/')
-    parser.add_argument('--negsample_size', type=int, default=99)
-    parser.add_argument('--max_len', type=int, default=20)
-    parser.add_argument('--item_min', type=int, default=10)
-    parser.add_argument('--save_path', type=str, default='./checkpoint/')
-    # parser.add_argument('--save_path', type=str, default='/data/home')
-    parser.add_argument('--task', type=int, default=-1)
-    parser.add_argument('--valid_rate', type=int, default=100)
-
-    parser.add_argument('--model_name', default='')
-    parser.add_argument('--epochs', type=int, default=20)
-    parser.add_argument('--re_epochs', type=int, default=20)
-
-    parser.add_argument('--lr', type=float, default=0.0005)
-
-    parser.add_argument('--device', default='cpu')  # cuda:0
-    parser.add_argument('--is_parallel', type=bool, default=False)
-    parser.add_argument('--local_rank', type=int)
-    parser.add_argument('--num_gpu', type=int, default=1)
-    parser.add_argument('--weight_decay', type=float, default=0.0, help='l2 regularization') #0.008
-    parser.add_argument('--decay_step', type=int, default=5, help='Decay step for StepLR')
-    parser.add_argument('--gamma', type=float, default=0.5, help='Gamma for StepLR')
-    parser.add_argument('--num_users', type=int, default=1, help='Number of total users')
-    parser.add_argument('--num_items', type=int, default=1, help='Number of total items')
-    parser.add_argument('--num_embedding', type=int, default=1, help='Number of total source items')
-    parser.add_argument('--num_labels', type=int, default=1, help='Number of total labels')
-    parser.add_argument('--k', type=int, default=20, help='The number of items to measure the hit@k metric (i.e. hit@10 to see if the correct item is within the top 10 scores)')
-    parser.add_argument('--metric_ks', nargs='+', type=int, default=[5, 20], help='ks for Metric@k')
-    parser.add_argument('--best_metric', type=str, default='NDCG@10', help='Metric for determining the best model')
-
-    #model param
-    parser.add_argument('--hidden_size', type=int, default=128, help='Size of hidden vectors (model)')
-    parser.add_argument('--block_num', type=int, default=2, help='Number of transformer layers')
-    parser.add_argument('--num_groups', type=int, default=4, help='Number of transformer groups')
-    parser.add_argument('--num_heads', type=int, default=4, help='Number of heads for multi-attention')
-    parser.add_argument('--dropout', type=float, default=0.3,
-                        help='Dropout probability to use throughout the model')
-    parser.add_argument('--bert_mask_prob', type=float, default=0.3,
-                        help='Probability for masking items in the training sequence')
-    parser.add_argument('--factor_num', type=int, default=128)
-    #Nextitnet
-    parser.add_argument('--embedding_size', type=int, default=128, help='embedding_size for model')
-    parser.add_argument('--dilations', type=int, default=[1, 4], help='Number of transformer layers')
-    parser.add_argument('--kernel_size', type=int, default=3, help='Number of heads for multi-attention')
-    parser.add_argument('--is_mp', type=bool, default=False, help='Number of heads for multi-attention')
-    parser.add_argument('--pad_token', type=int, default=0)
-    parser.add_argument('--temp', type=int, default=7)
-
-    #SASRec
-    parser.add_argument('--l2_emb', default=0.0, type=float)
-    #mtl
-    parser.add_argument('--mtl_task_num', type=int, default=1, help='0:like, 1:click, 2:two tasks')
-
-    #CF
-    parser.add_argument('--test_method', default='ufo', type=str)
-    parser.add_argument('--val_method', default='ufo', type=str)
-    parser.add_argument('--test_size', default=0.1, type=float)
-    parser.add_argument('--val_size', default=0.1111, type=float)
-    parser.add_argument('--cand_num', default=100, type=int)
-    parser.add_argument('--sample_method', default='high-pop', type=str) #
-    # parser.add_argument('--sample_method', default='uniform', type=str)
-    parser.add_argument('--sample_ratio', default=0.3, type=float)
-    parser.add_argument('--num_ng', default=4, type=int)
-    parser.add_argument('--loss_type', default='BPR', type=str)
-    parser.add_argument('--init_method', default='default', type=str)
-    parser.add_argument('--optimizer', default='default', type=str)
-    parser.add_argument('--early_stop', default=True, type=bool)
-    parser.add_argument('--reg_1', default=0.0, type=float)
-    parser.add_argument('--reg_2', default=0.0, type=float)
-    parser.add_argument('--context_window', default=2, type=int)
-    parser.add_argument('--rho', default=0.5, type=float)
-
-    #ngcf
-    parser.add_argument('--node_dropout', default=0.1,
-                        type=float,
-                        help='NGCF: Keep probability w.r.t. node dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
-    parser.add_argument('--mess_dropout', default=0.1,
-                        type=float,
-                        help='NGCF: Keep probability w.r.t. message dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
-    parser.add_argument('--hidden_size_list', default=[128, 128], type=list)
-
-    #vae
-    parser.add_argument('--latent_dim',
-                        type=int,
-                        default=128,
-                        help='bottleneck layer size for autoencoder')
-    parser.add_argument('--anneal_cap',
-                        type=float,
-                        default=0.2,
-                        help='Anneal penalty for VAE KL loss')
-    parser.add_argument('--total_anneal_steps',
-                        type=int,
-                        default=1000)
-    #model_KD
-    parser.add_argument('--kd', type=bool, default=False, help='True: Knowledge distilling, False: Cprec')
-    parser.add_argument('--alpha', default=0.4, type=float)
-
-    #model_acc
-    parser.add_argument('--add_num_times', type=int, default=2)
-
-    #transfer learning
-    parser.add_argument('--is_pretrain', type=int, default=1, help='0: mean transfer, 1: mean pretrain, 2:mean train full model without transfer')
-
-    #user_profile_represent
-    parser.add_argument('--user_profile', type=str, default='gender', help='user_profile: gender, age')
-
-    # life_long
-    parser.add_argument('--prun_rate', type=float, default=0)
-    parser.add_argument('--ll_max_itemnum', type=int, default=0)
-    parser.add_argument('--lifelong_eval', type=bool, default=True)
-    parser.add_argument('--task1_out', type=int, default=0)
-    parser.add_argument('--task2_out', type=int, default=0)
-    parser.add_argument('--task3_out', type=int, default=0)
-    parser.add_argument('--task4_out', type=int, default=0)
-    parser.add_argument('--eval', type=bool, default=True)
-
-    # cold_start
-    parser.add_argument('--ch', type=bool, default=True)
-
+    parser.add_argument('--config_file', type=str, default='./config/config.yaml', help='Path to the YAML configuration file')
     args = parser.parse_args()
+    try:
+        with open(args.config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        # 将配置项添加到 args 中
+        for key, value in config.items():
+            setattr(args, key, value)
+    except FileNotFoundError:
+        print(f"Error: Configuration file {args.config_file} not found.")
+    except yaml.YAMLError as e:
+        print(f"Error parsing YAML file: {e}")
+    # print(args)
+    # 将 args 转换为字典并输出键值对
+    args_dict = vars(args)
+    for key, value in args_dict.items():
+        print(f"{key}: {value}")
+    send_feishu_notification(webhook_url, f"模型：{args.model_name} 训练参数通知", args_dict)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('--seed', type=int, default=0)
+    # parser.add_argument('--task_name', default='')
+    # parser.add_argument('--task_num', type=int, default=4)
+    # parser.add_argument('--dataset_path', type=str, default='')
+    # parser.add_argument('--pretrain_path', type=str, default='')
+    # parser.add_argument('--source_path', type=str, default='')
+    # parser.add_argument('--target_path', type=str, default='')
+    # parser.add_argument('--train_batch_size', type=int, default=1024)
+    # parser.add_argument('--val_batch_size', type=int, default=1024)
+    # parser.add_argument('--test_batch_size', type=int, default=1024)
+    # parser.add_argument('--sample', type=str, default='random')
+    # parser.add_argument('--negsample_savefolder', type=str, default='./data/neg_data/')
+    # parser.add_argument('--negsample_size', type=int, default=99)
+    # parser.add_argument('--max_len', type=int, default=20)
+    # parser.add_argument('--item_min', type=int, default=10)
+    # parser.add_argument('--save_path', type=str, default='./checkpoint/')
+    # # parser.add_argument('--save_path', type=str, default='/data/home')
+    # parser.add_argument('--task', type=int, default=-1)
+    # parser.add_argument('--valid_rate', type=int, default=100)
+
+    # parser.add_argument('--model_name', default='')
+    # parser.add_argument('--epochs', type=int, default=20)
+    # parser.add_argument('--re_epochs', type=int, default=20)
+
+    # parser.add_argument('--lr', type=float, default=0.0005)
+
+    # parser.add_argument('--tag', type=str, default='V1')
+
+    # parser.add_argument('--device', default='cpu')  # cuda:0
+    # parser.add_argument('--is_parallel', type=bool, default=False)
+    # parser.add_argument('--local_rank', type=int)
+    # parser.add_argument('--num_gpu', type=int, default=1)
+    # parser.add_argument('--weight_decay', type=float, default=0.0, help='l2 regularization') #0.008
+    # parser.add_argument('--decay_step', type=int, default=5, help='Decay step for StepLR')
+    # parser.add_argument('--gamma', type=float, default=0.5, help='Gamma for StepLR')
+    # parser.add_argument('--num_users', type=int, default=1, help='Number of total users')
+    # parser.add_argument('--num_items', type=int, default=1, help='Number of total items')
+    # parser.add_argument('--num_embedding', type=int, default=1, help='Number of total source items')
+    # parser.add_argument('--num_labels', type=int, default=1, help='Number of total labels')
+    # parser.add_argument('--k', type=int, default=20, help='The number of items to measure the hit@k metric (i.e. hit@10 to see if the correct item is within the top 10 scores)')
+    # parser.add_argument('--metric_ks', nargs='+', type=int, default=[5, 20], help='ks for Metric@k')
+    # parser.add_argument('--best_metric', type=str, default='NDCG@10', help='Metric for determining the best model')
+
+    # #model param
+    # parser.add_argument('--hidden_size', type=int, default=128, help='Size of hidden vectors (model)')
+    # parser.add_argument('--block_num', type=int, default=2, help='Number of transformer layers')
+    # parser.add_argument('--num_groups', type=int, default=4, help='Number of transformer groups')
+    # parser.add_argument('--num_heads', type=int, default=4, help='Number of heads for multi-attention')
+    # parser.add_argument('--dropout', type=float, default=0.3,
+    #                     help='Dropout probability to use throughout the model')
+    # parser.add_argument('--bert_mask_prob', type=float, default=0.3,
+    #                     help='Probability for masking items in the training sequence')
+    # parser.add_argument('--factor_num', type=int, default=128)
+    # #Nextitnet
+    # parser.add_argument('--embedding_size', type=int, default=128, help='embedding_size for model')
+    # parser.add_argument('--dilations', type=int, default=[1, 4], help='Number of transformer layers')
+    # parser.add_argument('--kernel_size', type=int, default=3, help='Number of heads for multi-attention')
+    # parser.add_argument('--is_mp', type=bool, default=False, help='Number of heads for multi-attention')
+    # parser.add_argument('--pad_token', type=int, default=0)
+    # parser.add_argument('--temp', type=int, default=7)
+
+    # #SASRec
+    # parser.add_argument('--l2_emb', default=0.0, type=float)
+    # #mtl
+    # parser.add_argument('--mtl_task_num', type=int, default=1, help='0:like, 1:click, 2:two tasks')
+
+    # #CF
+    # parser.add_argument('--test_method', default='ufo', type=str)
+    # parser.add_argument('--val_method', default='ufo', type=str)
+    # parser.add_argument('--test_size', default=0.1, type=float)
+    # parser.add_argument('--val_size', default=0.1111, type=float)
+    # parser.add_argument('--cand_num', default=100, type=int)
+    # parser.add_argument('--sample_method', default='high-pop', type=str) #
+    # # parser.add_argument('--sample_method', default='uniform', type=str)
+    # parser.add_argument('--sample_ratio', default=0.3, type=float)
+    # parser.add_argument('--num_ng', default=4, type=int)
+    # parser.add_argument('--loss_type', default='BPR', type=str)
+    # parser.add_argument('--init_method', default='default', type=str)
+    # parser.add_argument('--optimizer', default='default', type=str)
+    # parser.add_argument('--early_stop', default=True, type=bool)
+    # parser.add_argument('--reg_1', default=0.0, type=float)
+    # parser.add_argument('--reg_2', default=0.0, type=float)
+    # parser.add_argument('--context_window', default=2, type=int)
+    # parser.add_argument('--rho', default=0.5, type=float)
+
+    # #ngcf
+    # parser.add_argument('--node_dropout', default=0.1,
+    #                     type=float,
+    #                     help='NGCF: Keep probability w.r.t. node dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
+    # parser.add_argument('--mess_dropout', default=0.1,
+    #                     type=float,
+    #                     help='NGCF: Keep probability w.r.t. message dropout (i.e., 1-dropout_ratio) for each deep layer. 1: no dropout.')
+    # parser.add_argument('--hidden_size_list', default=[128, 128], type=list)
+
+    # #vae
+    # parser.add_argument('--latent_dim',
+    #                     type=int,
+    #                     default=128,
+    #                     help='bottleneck layer size for autoencoder')
+    # parser.add_argument('--anneal_cap',
+    #                     type=float,
+    #                     default=0.2,
+    #                     help='Anneal penalty for VAE KL loss')
+    # parser.add_argument('--total_anneal_steps',
+    #                     type=int,
+    #                     default=1000)
+    # #model_KD
+    # parser.add_argument('--kd', type=bool, default=False, help='True: Knowledge distilling, False: Cprec')
+    # parser.add_argument('--alpha', default=0.4, type=float)
+
+    # #model_acc
+    # parser.add_argument('--add_num_times', type=int, default=2)
+
+    # #transfer learning
+    # parser.add_argument('--is_pretrain', type=int, default=1, help='0: mean transfer, 1: mean pretrain, 2:mean train full model without transfer')
+
+    # #user_profile_represent
+    # parser.add_argument('--user_profile', type=str, default='gender', help='user_profile: gender, age')
+
+    # # life_long
+    # parser.add_argument('--prun_rate', type=float, default=0)
+    # parser.add_argument('--ll_max_itemnum', type=int, default=0)
+    # parser.add_argument('--lifelong_eval', type=bool, default=True)
+    # parser.add_argument('--task1_out', type=int, default=0)
+    # parser.add_argument('--task2_out', type=int, default=0)
+    # parser.add_argument('--task3_out', type=int, default=0)
+    # parser.add_argument('--task4_out', type=int, default=0)
+    # parser.add_argument('--eval', type=bool, default=True)
+
+    # # cold_start
+    # parser.add_argument('--ch', type=bool, default=True)
+
+    # args = parser.parse_args()
     if args.is_parallel:
         torch.distributed.init_process_group(backend="nccl")
         torch.cuda.set_device(args.local_rank)
@@ -546,8 +571,11 @@ if __name__ == "__main__":
             model = PLE(user_feature_dict, item_feature_dict,device=args.device)
         elif args.model_name == 'hinet':
             model = HiNet(user_feature_dict, item_feature_dict,device=args.device)
+        elif args.model_name == 'smanet':
+            model = SMANet(user_feature_dict, item_feature_dict, device=args.device, num_heads=args.num_heads)
         else:
             raise NotImplementedError
+        
         mtlTrain(model, train_dataloader, val_dataloader, test_dataloader, args, train=False)
     elif args.task_name == 'transfer_learning':
         print('=============transfer_learning=============')

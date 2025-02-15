@@ -7,13 +7,18 @@ import torch.nn.utils.prune as prune
 import torch.nn.functional as F
 from sklearn.metrics import roc_auc_score
 from metrics import *
-from utils import scene_auc
+from utils import scene_auc, ndcg, scene_ndcg, send_feishu_notification
+import datetime
+from tqdm import tqdm
+webhook_url = "https://open.feishu.cn/open-apis/bot/v2/hook/0fd72c09-fa6f-4df7-ba25-f44dfca82cf1"
 
 def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
     device = args.device
     epoch = args.epochs
+    name = args.model_name
+    save_tag = args.save_tag
     early_stop = 5
-    path = os.path.join(args.save_path, '{}_{}_seed{}_best_model_{}.pth'.format(args.task_name, args.model_name, args.seed, args.mtl_task_num))
+    path = os.path.join(args.save_path, '{}_{}_seed{}_best_model_totaltasks{}_epochs{}_lr{}_{}.pth'.format(args.task_name, args.model_name, args.seed, args.mtl_task_num, epoch, args.lr, save_tag))
     loss_function = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     model.to(device)
@@ -45,7 +50,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 count += 1
             click_auc = roc_auc_score(y_train_click_true, y_train_click_predict)
             like_auc = roc_auc_score(y_train_like_true, y_train_like_predict)
-            print("Epoch %d train loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1, total_loss / count,
+            print("Epoch %d train loss is %.7f, click auc is %.7f and like auc is %.7f" % (i + 1, total_loss / count,
                                                                                              click_auc, like_auc))
             # 验证
             total_eval_loss = 0
@@ -69,7 +74,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 count_eval += 1
             click_auc = roc_auc_score(y_val_click_true, y_val_click_predict)
             like_auc = roc_auc_score(y_val_like_true, y_val_like_predict)
-            print("Epoch %d val loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1,
+            print("Epoch %d val loss is %.7f, click auc is %.7f and like auc is %.7f" % (i + 1,
                                                                                         total_eval_loss / count_eval,
                                                                                         click_auc, like_auc))
 
@@ -111,7 +116,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             count_eval += 1
         click_auc = roc_auc_score(y_test_click_true, y_test_click_predict)
         like_auc = roc_auc_score(y_test_like_true, y_test_like_predict)
-        print("Epoch %d test loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1,
+        print("Epoch %d test loss is %.7f, click auc is %.7f and like auc is %.7f" % (i + 1,
                                                                                      total_test_loss / count_eval,
                                                                                      click_auc, like_auc))
     elif args.mtl_task_num == 6:
@@ -133,7 +138,12 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(train_loader):
                 # ['is_click', 'is_like', 'is_follow','is_5s', 'is_10s', 'is_18s']
                 x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
-                predict, _ = model(x)
+                if name == 'hinet':
+                    predict, _, _, _, _= model(x)
+                elif name == 'smanet':
+                    predict, _, kl_loss = model(x)
+                else:
+                    predict, _ = model(x)
 
                 # 真实值
                 y_train_click_true += list(y1.squeeze().cpu().numpy())
@@ -155,22 +165,43 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 loss_4 = loss_function(predict[3], y4.unsqueeze(1).float())
                 loss_5 = loss_function(predict[4], y5.unsqueeze(1).float())
                 loss_6 = loss_function(predict[5], y6.unsqueeze(1).float())
-                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
+                if name == 'smanet':
+                    loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6 + kl_loss
+                else:
+                    loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
                 total_loss += float(loss)
                 count += 1
-            # 总场景
-            click_auc = roc_auc_score(y_train_click_true, y_train_click_predict)
-            like_auc = roc_auc_score(y_train_like_true, y_train_like_predict)
-            follow_auc = roc_auc_score(y_train_follow_true, y_train_follow_predict)
-            s5_auc = roc_auc_score(y_train_5s_true, y_train_5s_predict)
-            s10_auc = roc_auc_score(y_train_10s_true, y_train_10s_predict)
-            s18_auc = roc_auc_score(y_train_18s_true, y_train_18s_predict)
-            print("Epoch %d train loss is %.3f, total scene, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, 
+            train_current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # 总场景AUC
+            click_auc_train = roc_auc_score(y_train_click_true, y_train_click_predict)
+            like_auc_train = roc_auc_score(y_train_like_true, y_train_like_predict)
+            follow_auc_train = roc_auc_score(y_train_follow_true, y_train_follow_predict)
+            s5_auc_train = roc_auc_score(y_train_5s_true, y_train_5s_predict)
+            s10_auc_train = roc_auc_score(y_train_10s_true, y_train_10s_predict)
+            s18_auc_train = roc_auc_score(y_train_18s_true, y_train_18s_predict)
+
+            # 总场景NDCG
+            click_ndcg_train = ndcg(y_train_click_true, y_train_click_predict)
+            like_ndcg_train = ndcg(y_train_like_true, y_train_like_predict)
+            follow_ndcg_train = ndcg(y_train_follow_true, y_train_follow_predict)
+            s5_ndcg_train = ndcg(y_train_5s_true, y_train_5s_predict)
+            s10_ndcg_train = ndcg(y_train_10s_true, y_train_10s_predict)
+            s18_ndcg_train = ndcg(y_train_18s_true, y_train_18s_predict)
+            if (i+1) % 20 == 0:
+                auc_message = f'Epoch {i+1}, time : {train_current_time}。\n total loss is : {total_loss / count}, total scene。\n click auc : {click_auc_train}, like auc : {like_auc_train}, comment auc : {follow_auc_train}, \n 5s auc : {s5_auc_train}, 10s auc : {s10_auc_train}, 18s auc : {s18_auc_train}'
+                send_feishu_notification(webhook_url, f"model {name} | {save_tag} train result auc result: ", auc_message)
+                ndcg_message = f'Epoch {i+1}, time : {train_current_time}。\n total loss is : {total_loss / count}, total scene。\n click ndcg : {click_ndcg_train}, like ndcg : {like_ndcg_train}, comment ndcg : {follow_ndcg_train}, \n 5s ndcg : {s5_ndcg_train}, 10s ndcg : {s10_ndcg_train}, 18s ndcg : {s18_ndcg_train}'
+                send_feishu_notification(webhook_url, f"model {name} | {save_tag} train result ndcg result: ", ndcg_message)
+            print(f'Epoch {i+1} training over ! time : {train_current_time}')
+            print("Epoch %d train loss is %.7f, total scene, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1,
                                                         total_loss / count, 
-                                                       click_auc, like_auc,follow_auc, s5_auc, s10_auc, s18_auc))
+                                                       click_auc_train, like_auc_train, follow_auc_train, s5_auc_train, s10_auc_train, s18_auc_train))
+            print("Epoch %d train loss is %.7f, total scene, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, 
+                                                        total_loss / count, 
+                                                       click_ndcg_train, like_ndcg_train, follow_ndcg_train, s5_ndcg_train, s10_ndcg_train, s18_ndcg_train))
             
             # 验证
             total_eval_loss = 0
@@ -191,7 +222,12 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             scene = []
             for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(val_loader):
                 x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
-                predict, scene_feature = model(x)
+                if name == 'hinet':
+                    predict, scene_feature, _, _, _ = model(x)
+                elif name == 'smanet':
+                    predict, scene_feature, kl_loss = model(x)
+                else:
+                    predict, scene_feature = model(x)
                 #场景特征
                 scene += list(scene_feature.squeeze().cpu().numpy())
                 # 真实值
@@ -216,7 +252,10 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                 loss_4 = loss_function(predict[3], y4.unsqueeze(1).float())
                 loss_5 = loss_function(predict[4], y5.unsqueeze(1).float())
                 loss_6 = loss_function(predict[5], y6.unsqueeze(1).float())
-                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
+                if name == 'smanet':
+                    loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6 + kl_loss
+                else:
+                    loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
                 total_eval_loss += float(loss)
                 count_eval += 1
 
@@ -228,25 +267,51 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             s10_predict, s10_true = np.array(y_val_10s_predict), np.array(y_val_10s_true)
             s18_predict, s18_true = np.array(y_val_18s_predict), np.array(y_val_18s_true)
 
-            # 总场景
+            # 总场景AUC
             click_auc = roc_auc_score(click_true, click_predict)
-            like_auc = roc_auc_score(y_val_like_true, y_val_like_predict)
-            follow_auc = roc_auc_score(y_val_follow_true, y_val_follow_predict)
-            s5_auc = roc_auc_score(y_val_5s_true, y_val_5s_predict)
-            s10_auc = roc_auc_score(y_val_10s_true, y_val_10s_predict)
-            s18_auc = roc_auc_score(y_val_18s_true, y_val_18s_predict)
-            print("Epoch %d val loss is %.3f, total scene, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1,
+            like_auc = roc_auc_score(like_true, like_predict)
+            follow_auc = roc_auc_score(follow_true, follow_predict)
+            s5_auc = roc_auc_score(s5_true, s5_predict)
+            s10_auc = roc_auc_score(s10_true, s10_predict)
+            s18_auc = roc_auc_score(s18_true, s18_predict)
+
+            # 总场景NDCG
+            click_ndcg = ndcg(click_true, click_predict)
+            like_ndcg = ndcg(like_true, like_predict)
+            follow_ndcg = ndcg(follow_true, follow_predict)
+            s5_ndcg = ndcg(s5_true, s5_predict)
+            s10_ndcg = ndcg(s10_true, s10_predict)
+            s18_ndcg = ndcg(s18_true, s18_predict)
+            if (i+1) % 20 == 0:
+                val_current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                val_auc_message = f'Epoch {i+1}, time : {val_current_time}。\n total loss is : {total_eval_loss / count_eval}, total scene。\n click auc : {click_auc}, like auc : {like_auc}, comment auc : {follow_auc}, \n 5s auc : {s5_auc}, 10s auc : {s10_auc}, 18s auc : {s18_auc}'
+                send_feishu_notification(webhook_url, f"model  {name} | {save_tag} total scene val auc result", val_auc_message)
+                val_ndcg_message = f'Epoch {i+1}, time : {val_current_time}。\n total loss is : {total_eval_loss / count_eval}, total scene。\n click ndcg : {click_ndcg}, like ndcg : {like_ndcg}, comment ndcg : {follow_ndcg}, \n 5s ndcg : {s5_ndcg}, 10s ndcg : {s10_ndcg}, 18s ndcg : {s18_ndcg}'
+                send_feishu_notification(webhook_url, f"model  {name} | {save_tag} total scene val ndcg result", val_ndcg_message)
+            print("Epoch %d val loss is %.7f, total scene, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1,
                                                                                         total_eval_loss / count_eval,
                                                                                         click_auc, like_auc, follow_auc, s5_auc, s10_auc, s18_auc))
-            # 场景1:
+            print("Epoch %d val loss is %.7f, total scene, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1,
+                                                                                        total_eval_loss / count_eval,
+                                                                                        click_ndcg, like_ndcg, follow_ndcg, s5_ndcg, s10_ndcg, s18_ndcg))
+            # 场景1 AUC:
             click_auc_1 = scene_auc(click_predict, click_true, scene, 0)
             like_auc_1 = scene_auc(like_predict, like_true, scene, 0)
             follow_auc_1 = scene_auc(follow_predict, follow_true, scene, 0)
             s5_auc_1 = scene_auc(s5_predict, s5_true, scene, 0)
             s10_auc_1 = scene_auc(s10_predict, s10_true, scene, 0)
             s18_auc_1 = scene_auc(s18_predict, s18_true, scene, 0)
-            print("Epoch %d val loss is %.3f, scene 1, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+            print("Epoch %d val loss is %.7f, scene 1, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_loss / count, 
                                                        click_auc_1, like_auc_1, follow_auc_1, s5_auc_1, s10_auc_1, s18_auc_1))
+            # 场景1 NDCG：
+            click_ndcg_1 = scene_ndcg(click_predict, click_true, scene, 0)
+            like_ndcg_1 = scene_ndcg(like_predict, like_true, scene, 0)
+            follow_ndcg_1 = scene_ndcg(follow_predict, follow_true, scene, 0)
+            s5_ndcg_1 = scene_ndcg(s5_predict, s5_true, scene, 0)
+            s10_ndcg_1 = scene_ndcg(s10_predict, s10_true, scene, 0)
+            s18_ndcg_1 = scene_ndcg(s18_predict, s18_true, scene, 0)
+            print("Epoch %d val loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_loss / count, 
+                                                       click_ndcg_1, like_ndcg_1, follow_ndcg_1, s5_ndcg_1, s10_ndcg_1, s18_ndcg_1))
 
             # 场景2:       
             click_auc_2 = scene_auc(click_predict, click_true, scene, 1)
@@ -255,8 +320,17 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             s5_auc_2 = scene_auc(s5_predict, s5_true, scene, 1)
             s10_auc_2 = scene_auc(s10_predict, s10_true, scene, 1)
             s18_auc_2 = scene_auc(s18_predict, s18_true, scene, 1)
-            print("Epoch %d val loss is %.3f, scene 2, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+            print("Epoch %d val loss is %.7f, scene 2, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_loss / count, 
                                                        click_auc_2, like_auc_2, follow_auc_2, s5_auc_2, s10_auc_2, s18_auc_2))
+            # 场景2 NDCG：
+            click_ndcg_2 = scene_ndcg(click_predict, click_true, scene, 1)
+            like_ndcg_2 = scene_ndcg(like_predict, like_true, scene, 1)
+            follow_ndcg_2 = scene_ndcg(follow_predict, follow_true, scene, 1)
+            s5_ndcg_2 = scene_ndcg(s5_predict, s5_true, scene, 1)
+            s10_ndcg_2 = scene_ndcg(s10_predict, s10_true, scene, 1)
+            s18_ndcg_2 = scene_ndcg(s18_predict, s18_true, scene, 1)
+            print("Epoch %d val loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_loss / count, 
+                                                       click_ndcg_2, like_ndcg_2, follow_ndcg_2, s5_ndcg_2, s10_ndcg_2, s18_ndcg_2))
             # 场景3:
             click_auc_3 = scene_auc(click_predict, click_true, scene, 2)
             like_auc_3 = scene_auc(like_predict, like_true, scene, 2)
@@ -264,8 +338,17 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             s5_auc_3 = scene_auc(s5_predict, s5_true, scene, 2)
             s10_auc_3 = scene_auc(s10_predict, s10_true, scene, 2)
             s18_auc_3 = scene_auc(s18_predict, s18_true, scene, 2)
-            print("Epoch %d val loss is %.3f, scene 3, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+            print("Epoch %d val loss is %.7f, scene 2, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_loss / count, 
                                                        click_auc_3, like_auc_3, follow_auc_3, s5_auc_3, s10_auc_3, s18_auc_3))
+            # 场景3 NDCG：
+            click_ndcg_3 = scene_ndcg(click_predict, click_true, scene, 2)
+            like_ndcg_3 = scene_ndcg(like_predict, like_true, scene, 2)
+            follow_ndcg_3 = scene_ndcg(follow_predict, follow_true, scene, 2)
+            s5_ndcg_3 = scene_ndcg(s5_predict, s5_true, scene, 2)
+            s10_ndcg_3 = scene_ndcg(s10_predict, s10_true, scene, 2)
+            s18_ndcg_3 = scene_ndcg(s18_predict, s18_true, scene, 2)
+            print("Epoch %d val loss is %.7f, scene 3, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_loss / count, 
+                                                       click_ndcg_3, like_ndcg_3, follow_ndcg_3, s5_ndcg_3, s10_ndcg_3, s18_ndcg_3))
             # 场景4:
             click_auc_4 = scene_auc(click_predict, click_true, scene, 3)
             like_auc_4 = scene_auc(like_predict, like_true, scene, 3)
@@ -273,50 +356,221 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             s5_auc_4 = scene_auc(s5_predict, s5_true, scene, 3)
             s10_auc_4 = scene_auc(s10_predict, s10_true, scene, 3)
             s18_auc_4 = scene_auc(s10_predict, s10_true, scene, 3)
-            print("Epoch %d val loss is %.3f, scene 4, click auc is %.3f, like auc is %.3f, follow auc is %.3f, 5s auc is %.3f, 10s auc is %.3f, 18s auc is %.3f" % (i + 1, total_loss / count, 
+            print("Epoch %d val loss is %.7f, scene 4, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_loss / count, 
                                                        click_auc_4, like_auc_4, follow_auc_4, s5_auc_4, s10_auc_4, s18_auc_4))
+            # 场景4 NDCG：
+            click_ndcg_4 = scene_ndcg(click_predict, click_true, scene, 3)
+            like_ndcg_4 = scene_ndcg(like_predict, like_true, scene, 3)
+            follow_ndcg_4 = scene_ndcg(follow_predict, follow_true, scene, 3)
+            s5_ndcg_4 = scene_ndcg(s5_predict, s5_true, scene, 3)
+            s10_ndcg_4 = scene_ndcg(s10_predict, s10_true, scene, 3)
+            s18_ndcg_4 = scene_ndcg(s18_predict, s18_true, scene, 3)
+            print("Epoch %d val loss is %.7f, scene 4, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_loss / count, 
+                                                       click_ndcg_4, like_ndcg_4, follow_ndcg_4, s5_ndcg_4, s10_ndcg_4, s18_ndcg_4))
 
-#            # earl stopping
-#            if i == 0:
-#                eval_loss = total_eval_loss / count_eval
-#            else:
-#                if total_eval_loss / count_eval < eval_loss:
-#                    eval_loss = total_eval_loss / count_eval
-#                    state = model.state_dict()
-#                    torch.save(state, path)
-#                else:
-#                    if patience < early_stop:
-#                        patience += 1
-#                    else:
-#                        print("val loss is not decrease in %d epoch and break training" % patience)
-#                        break
+           # earl stopping
+            # if i == 0:
+            #    eval_loss = total_eval_loss / count_eval
+            # else:
+            #    if total_eval_loss / count_eval < eval_loss:
+            #        eval_loss = total_eval_loss / count_eval
+            #        state = model.state_dict()
+            #        torch.save(state, path)
+            #    else:
+            #        if patience < early_stop:
+            #            patience += 1
+            #        else:
+            #            print("val loss is not decrease in %d epoch and break training" % patience)
+            #            break
+
+        # 保存model
+        state = model.state_dict()
+        torch.save(state, path)
+
         #test
-        # state = torch.load(path)
-        # model.load_state_dict(state)
-        # total_test_loss = 0
-        # model.eval()
-        # count_eval = 0
-        # y_test_click_true = []
-        # y_test_like_true = []
-        # y_test_click_predict = []
-        # y_test_like_predict = []
-        # for idx, (x, y1, y2) in enumerate(test_loader):
-        #     x, y1, y2 = x.to(device), y1.to(device), y2.to(device)
-        #     predict = model(x)
-        #     y_test_click_true += list(y1.squeeze().cpu().numpy())
-        #     y_test_like_true += list(y2.squeeze().cpu().numpy())
-        #     y_test_click_predict += list(predict[0].squeeze().cpu().detach().numpy())
-        #     y_test_like_predict += list(predict[1].squeeze().cpu().detach().numpy())
-        #     loss_1 = loss_function(predict[0], y1.unsqueeze(1).float())
-        #     loss_2 = loss_function(predict[1], y2.unsqueeze(1).float())
-        #     loss = loss_1 + loss_2
-        #     total_test_loss += float(loss)
-        #     count_eval += 1
-        # click_auc = roc_auc_score(y_test_click_true, y_test_click_predict)
-        # like_auc = roc_auc_score(y_test_like_true, y_test_like_predict)
-        # print("Epoch %d test loss is %.3f, click auc is %.3f and like auc is %.3f" % (i + 1,
-        #                                                                              total_test_loss / count_eval,
-        #                                                                              click_auc, like_auc))
+        state = torch.load(path)
+        model.load_state_dict(state)
+        total_test_loss = 0
+        model.eval()
+        count_test = 0
+        y_test_click_true = []
+        y_test_like_true = []
+        y_test_click_predict = []
+        y_test_like_predict = []
+        y_test_follow_true = []
+        y_test_follow_predict = []
+        y_test_5s_true = []
+        y_test_5s_predict = []
+        y_test_10s_true = []
+        y_test_10s_predict = []
+        y_test_18s_true = []
+        y_test_18s_predict = []
+        test_scene = []
+        SAN_Gate = []
+        atten_score_list = []
+        share_scene_gate_list = []
+        all_scene_gate_list = []
+        for idx, (x, y1, y2, y3, y4, y5, y6) in enumerate(test_loader):
+            x, y1, y2, y3, y4, y5, y6 = x.to(device), y1.to(device), y2.to(device), y3.to(device), y4.to(device), y5.to(device), y6.to(device)
+            if name == 'hinet':
+                predict, scene_feature, san_gate, share_scene_gate, all_scene_gate = model(x)
+                # print(f'scene_feature : {scene_feature.size()} | san_gate : {san_gate.size()} | share_scene_gate : {share_scene_gate.size()} | all_scene_gate : {all_scene_gate.size()}')
+                SAN_Gate += list(san_gate.squeeze().detach().cpu().numpy())
+                share_scene_gate_list += list(share_scene_gate.squeeze().detach().cpu().numpy())
+                all_scene_gate_list += list(all_scene_gate.squeeze().detach().cpu().numpy())
+            elif name == 'smanet':
+                predict, scene_feature, kl_loss = model(x)
+                # atten_score_list += list(atten_score.squeeze().detach().cpu().numpy())
+            else:
+                predict, scene_feature = model(x)
+            test_scene += list(scene_feature.squeeze().cpu().numpy())
+            # 真实值
+            y_test_click_true += list(y1.squeeze().cpu().numpy())
+            y_test_like_true += list(y2.squeeze().cpu().numpy())
+            y_test_follow_true += list(y3.squeeze().cpu().numpy())
+            y_test_5s_true += list(y4.squeeze().cpu().numpy())
+            y_test_10s_true += list(y5.squeeze().cpu().numpy())
+            y_test_18s_true += list(y6.squeeze().cpu().numpy())
+            # 预测值
+            y_test_click_predict += list(predict[0].squeeze().cpu().detach().numpy())
+            y_test_like_predict += list(predict[1].squeeze().cpu().detach().numpy())
+            y_test_follow_predict += list(predict[2].squeeze().cpu().detach().numpy())
+            y_test_5s_predict += list(predict[3].squeeze().cpu().detach().numpy())
+            y_test_10s_predict += list(predict[4].squeeze().cpu().detach().numpy())
+            y_test_18s_predict += list(predict[5].squeeze().cpu().detach().numpy())
+            # loss
+            loss_1 = loss_function(predict[0], y1.unsqueeze(1).float())
+            loss_2 = loss_function(predict[1], y2.unsqueeze(1).float())
+            loss_3 = loss_function(predict[2], y3.unsqueeze(1).float())
+            loss_4 = loss_function(predict[3], y4.unsqueeze(1).float())
+            loss_5 = loss_function(predict[4], y5.unsqueeze(1).float())
+            loss_6 = loss_function(predict[5], y6.unsqueeze(1).float())
+            if name == 'smanet':
+                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6 + kl_loss
+            else:
+                loss = loss_1 + loss_2 + loss_3 + loss_4 + loss_5 + loss_6
+            total_test_loss += float(loss)
+            count_test += 1
+        if SAN_Gate:
+            SAN_Gate = np.array(SAN_Gate)
+            share_scene_gate_list = np.array(share_scene_gate_list)
+            all_scene_gate_list = np.array(all_scene_gate_list)
+            np.save(f'./npy_save/SAN_Gate.npy_{save_tag}', SAN_Gate)
+            np.save(f'./npy_save/share_scene_gate_{save_tag}.npy', share_scene_gate_list)
+            np.save(f'./npy_save/all_scene_gate_{save_tag}.npy', all_scene_gate_list)
+        if atten_score_list:
+            atten_score_list = np.array(atten_score_list)
+            np.save(f'./npy_save/atten_score_{save_tag}.npy', atten_score_list)
+        test_scene = np.array(test_scene)
+        np.save(f'./npy_save/{name}_scene_features_{save_tag}.npy', test_scene)
+        test_click_predict, test_click_true = np.array(y_test_click_predict), np.array(y_test_click_true)
+        test_like_predict, test_like_true = np.array(y_test_like_predict), np.array(y_test_like_true)
+        test_follow_predict, test_follow_true = np.array(y_test_follow_predict), np.array(y_test_follow_true)
+        test_s5_predict, test_s5_true = np.array(y_test_5s_predict), np.array(y_test_5s_true)
+        test_s10_predict, test_s10_true = np.array(y_test_10s_predict), np.array(y_test_10s_true)
+        test_s18_predict, test_s18_true = np.array(y_test_18s_predict), np.array(y_test_18s_true)
+
+        # 总场景AUC
+        click_auc_test = roc_auc_score(test_click_true, test_click_predict)
+        like_auc_test = roc_auc_score(test_like_true, test_like_predict)
+        follow_auc_test = roc_auc_score(test_follow_true, test_follow_predict)
+        s5_auc_test = roc_auc_score(test_s5_true, test_s5_predict)
+        s10_auc_test = roc_auc_score(test_s10_true, test_s10_predict)
+        s18_auc_test = roc_auc_score(test_s18_true, test_s18_predict)
+        print("Epoch %d test loss is %.7f, total scene, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1,
+                                                                                    total_test_loss / count_test,
+                                                                                    click_auc_test, like_auc_test, follow_auc_test, s5_auc_test, s10_auc_test, s18_auc_test))
+        # 总场景NDCG
+        click_ndcg = ndcg(test_click_true, test_click_predict)
+        like_ndcg = ndcg(test_like_true, test_like_predict)
+        follow_ndcg = ndcg(test_follow_true, test_follow_predict)
+        s5_ndcg = ndcg(test_s5_true, test_s5_predict)
+        s10_ndcg = ndcg(test_s10_true, test_s10_predict)
+        s18_ndcg = ndcg(test_s18_true, test_s18_predict)
+        print("Epoch %d test loss is %.7f, total scene, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1,
+                                                                                        total_test_loss / count_test,
+                                                                                        click_ndcg, like_ndcg, follow_ndcg, s5_ndcg, s10_ndcg, s18_ndcg))
+        # 发送给飞书
+        test_current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        test_auc_message = f'Epoch {i+1}, time : {test_current_time}。\n total loss is : {total_test_loss / count_test}, total scene。\n click auc : {click_auc_test}, like auc : {like_auc_test}, comment auc : {follow_auc_test}, \n 5s auc : {s5_auc_test}, 10s auc : {s10_auc_test}, 18s auc : {s18_auc_test}'
+        send_feishu_notification(webhook_url, f"model  {name} | {save_tag} total scene test auc result", test_auc_message)
+        test_ndcg_message = f'Epoch {i+1}, time : {test_current_time}。\n total loss is : {total_test_loss / count_test}, total scene。\n click ndcg : {click_ndcg}, like ndcg : {like_ndcg}, comment ndcg : {follow_ndcg}, \n 5s ndcg : {s5_ndcg}, 10s ndcg : {s10_ndcg}, 18s ndcg : {s18_ndcg}'
+        send_feishu_notification(webhook_url, f"model  {name} | {save_tag} total scene test ndcg result", test_ndcg_message)
+        
+        # 场景1:
+        click_auc_1 = scene_auc(test_click_predict, test_click_true, scene, 0)
+        like_auc_1 = scene_auc(test_like_predict, test_like_true, scene, 0)
+        follow_auc_1 = scene_auc(test_follow_predict, test_follow_true, scene, 0)
+        s5_auc_1 = scene_auc(test_s5_predict, test_s5_true, scene, 0)
+        s10_auc_1 = scene_auc(test_s10_predict, test_s10_true, scene, 0)
+        s18_auc_1 = scene_auc(test_s18_predict, test_s18_true, scene, 0)
+        print("Epoch %d test loss is %.7f, scene 1, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_test_loss / count_test, 
+                                                click_auc_1, like_auc_1, follow_auc_1, s5_auc_1, s10_auc_1, s18_auc_1))
+        # 场景1 NDCG：
+        click_ndcg_1 = scene_ndcg(test_click_predict, test_click_true, scene, 0)
+        like_ndcg_1 = scene_ndcg(test_like_predict, test_like_true, scene, 0)
+        follow_ndcg_1 = scene_ndcg(test_follow_predict, test_follow_true, scene, 0)
+        s5_ndcg_1 = scene_ndcg(test_s5_predict, test_s5_true, scene, 0)
+        s10_ndcg_1 = scene_ndcg(test_s10_predict, test_s10_true, scene, 0)
+        s18_ndcg_1 = scene_ndcg(test_s18_predict, test_s18_true, scene, 0)
+        print("Epoch %d test loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_test_loss / count_test,
+                                                    click_ndcg_1, like_ndcg_1, follow_ndcg_1, s5_ndcg_1, s10_ndcg_1, s18_ndcg_1))
+
+        # 场景2:       
+        click_auc_2 = scene_auc(test_click_predict, test_click_true, scene, 1)
+        like_auc_2 = scene_auc(test_like_predict, test_like_true, scene, 1)
+        follow_auc_2 = scene_auc(test_follow_predict, test_follow_true, scene, 1)
+        s5_auc_2 = scene_auc(test_s5_predict, test_s5_true, scene, 1)
+        s10_auc_2 = scene_auc(test_s10_predict, test_s10_true, scene, 1)
+        s18_auc_2 = scene_auc(test_s18_predict, test_s18_true, scene, 1)
+        print("Epoch %d test loss is %.7f, scene 2, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_test_loss / count_test, 
+                                                click_auc_2, like_auc_2, follow_auc_2, s5_auc_2, s10_auc_2, s18_auc_2))
+        # 场景2 NDCG：
+        click_ndcg_2 = scene_ndcg(test_click_predict, test_click_true, scene, 1)
+        like_ndcg_2 = scene_ndcg(test_like_predict, test_like_true, scene, 1)
+        follow_ndcg_2 = scene_ndcg(test_follow_predict, test_follow_true, scene, 1)
+        s5_ndcg_2 = scene_ndcg(test_s5_predict, test_s5_true, scene, 1)
+        s10_ndcg_2 = scene_ndcg(test_s10_predict, test_s10_true, scene, 1)
+        s18_ndcg_2 = scene_ndcg(test_s18_predict, test_s18_true, scene, 1)
+        print("Epoch %d test loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_test_loss / count_test,
+                                                    click_ndcg_2, like_ndcg_2, follow_ndcg_2, s5_ndcg_2, s10_ndcg_2, s18_ndcg_2))
+        # 场景3:
+        click_auc_3 = scene_auc(test_click_predict, test_click_true, scene, 2)
+        like_auc_3 = scene_auc(test_like_predict, test_like_true, scene, 2)
+        follow_auc_3 = scene_auc(test_follow_predict, test_follow_true, scene, 2)
+        s5_auc_3 = scene_auc(test_s5_predict, test_s5_true, scene, 2)
+        s10_auc_3 = scene_auc(test_s10_predict, test_s10_true, scene, 2)
+        s18_auc_3 = scene_auc(test_s18_predict, test_s18_true, scene, 2)
+        print("Epoch %d test loss is %.7f, scene 3, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_test_loss / count_test, 
+                                                click_auc_3, like_auc_3, follow_auc_3, s5_auc_3, s10_auc_3, s18_auc_3))
+        # 场景3 NDCG：
+        click_ndcg_3 = scene_ndcg(test_click_predict, test_click_true, scene, 2)
+        like_ndcg_3 = scene_ndcg(test_like_predict, test_like_true, scene, 2)
+        follow_ndcg_3 = scene_ndcg(test_follow_predict, test_follow_true, scene, 2)
+        s5_ndcg_3 = scene_ndcg(test_s5_predict, test_s5_true, scene, 2)
+        s10_ndcg_3 = scene_ndcg(test_s10_predict, test_s10_true, scene, 2)
+        s18_ndcg_3 = scene_ndcg(test_s18_predict, test_s18_true, scene, 2)
+        print("Epoch %d test loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_test_loss / count_test,
+                                                    click_ndcg_3, like_ndcg_3, follow_ndcg_3, s5_ndcg_3, s10_ndcg_3, s18_ndcg_3))
+        # 场景4:
+        click_auc_1 = scene_auc(test_click_predict, test_click_true, scene, 3)
+        like_auc_1 = scene_auc(test_like_predict, test_like_true, scene, 3)
+        follow_auc_1 = scene_auc(test_follow_predict, test_follow_true, scene, 3)
+        s5_auc_1 = scene_auc(test_s5_predict, test_s5_true, scene, 3)
+        s10_auc_1 = scene_auc(test_s10_predict, test_s10_true, scene, 3)
+        s18_auc_1 = scene_auc(test_s18_predict, test_s18_true, scene, 3)
+        print("Epoch %d test loss is %.7f, scene 4, click auc is %.7f, like auc is %.7f, comment auc is %.7f, 5s auc is %.7f, 10s auc is %.7f, 18s auc is %.7f" % (i + 1, total_test_loss / count_test, 
+                                                click_auc_4, like_auc_4, follow_auc_4, s5_auc_4, s10_auc_4, s18_auc_4))
+        # 场景4 NDCG：
+        click_ndcg_4 = scene_ndcg(test_click_predict, test_click_true, scene, 3)
+        like_ndcg_4 = scene_ndcg(test_like_predict, test_like_true, scene, 3)
+        follow_ndcg_4 = scene_ndcg(test_follow_predict, test_follow_true, scene, 3)
+        s5_ndcg_4 = scene_ndcg(test_s5_predict, test_s5_true, scene, 3)
+        s10_ndcg_4 = scene_ndcg(test_s10_predict, test_s10_true, scene, 3)
+        s18_ndcg_4 = scene_ndcg(test_s18_predict, test_s18_true, scene, 3)
+        print("Epoch %d test loss is %.7f, scene 1, click ndcg is %.7f, like ndcg is %.7f, comment ndcg is %.7f, 5s ndcg is %.7f, 10s ndcg is %.7f, 18s ndcg is %.7f" % (i + 1, total_test_loss / count_test,
+                                                    click_ndcg_4, like_ndcg_4, follow_ndcg_4, s5_ndcg_4, s10_ndcg_4, s18_ndcg_4))
+
 
     else:
         if train:
@@ -338,7 +592,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                     total_loss += float(loss)
                     count += 1
                 auc = roc_auc_score(y_train_label_true, y_train_label_predict)
-                print("Epoch %d train loss is %.3f, auc is %.3f" % (i + 1, total_loss / count, auc))
+                print("Epoch %d train loss is %.7f, auc is %.7f" % (i + 1, total_loss / count, auc))
                 # 验证
                 total_eval_loss = 0
                 model.eval()
@@ -355,7 +609,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
                     total_eval_loss += float(loss)
                     count_eval += 1
                 auc = roc_auc_score(y_val_label_true, y_val_label_predict)
-                print("Epoch %d val loss is %.3f, auc is %.3f " % (i + 1, total_eval_loss / count_eval,
+                print("Epoch %d val loss is %.7f, auc is %.7f " % (i + 1, total_eval_loss / count_eval,
                                                                                              auc))
                 # earl stopping
                 if i == 0:
@@ -387,7 +641,7 @@ def mtlTrain(model, train_loader, val_loader, test_loader, args, train=True):
             total_test_loss += float(loss)
             count_eval += 1
         auc = roc_auc_score(y_test_label_true, y_test_label_predict)
-        print("Epoch %d test loss is %.3f, auc is %.3f" % (i + 1, total_test_loss / count_eval,
+        print("Epoch %d test loss is %.7f, auc is %.7f" % (i + 1, total_test_loss / count_eval,
                                                                                       auc))
 
 def Infacc_Train(epochs, b_model, p_model, train_loader, val_loader, writer, args): #, user_noclicks

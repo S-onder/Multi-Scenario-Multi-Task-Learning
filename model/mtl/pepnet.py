@@ -10,9 +10,9 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 
-class PLE(nn.Module):
+class PEPNet(nn.Module):
     """
-    PLE for CTCVR problem
+    PEPNet for CTCVR problem
     """
 
     def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, 
@@ -32,7 +32,7 @@ class PLE(nn.Module):
         :param expert_activation: activation function like 'relu' or 'sigmoid'
         :param task: list of task name
         """
-        super(PLE, self).__init__()
+        super(PEPNet, self).__init__()
         # check input parameters
         if user_feature_dict is None or item_feature_dict is None:
             raise Exception("input parameter user_feature_dict and item_feature_dict must be not None")
@@ -45,6 +45,7 @@ class PLE(nn.Module):
         self.num_task = len(task)
         self.shared_expert = shared_expert
         self.task = task
+        self.num_features = len(item_feature_dict) + len(user_feature_dict)
         # n_expert = len(task)
 
         if device:
@@ -65,6 +66,7 @@ class PLE(nn.Module):
         hidden_size = emb_dim * (user_cate_feature_nums + item_cate_feature_nums) + \
                       (len(self.user_feature_dict) - user_cate_feature_nums) + (
                               len(self.item_feature_dict) - item_cate_feature_nums)
+        self.hidden_size = hidden_size
 
         # shared-expert
         # input_dim = embedding_dim
@@ -101,11 +103,6 @@ class PLE(nn.Module):
             setattr(self, 'task_{}_gate'.format(n_task+1), nn.ModuleList())
             getattr(self, 'task_{}_gate'.format(n_task+1)).add_module('linear', nn.Linear(hidden_size, shared_expert+1, device=self.device))
             getattr(self, 'task_{}_gate'.format(n_task+1)).add_module('softmax', nn.Softmax(dim=-1))
-        #self.gates = [torch.nn.Parameter(torch.rand(hidden_size, shared_expert+1), requires_grad=True) for _ in
-        #              range(self.num_task)] # gate 形状是[-1,2,64]
-        #for gate in self.gates:
-        #    gate.data.normal_(0, 1)
-        #self.gates_bias = [torch.nn.Parameter(torch.rand(shared_expert+1), requires_grad=True) for _ in range(self.num_task)]
 
 
         # tower
@@ -121,20 +118,35 @@ class PLE(nn.Module):
                                                                             nn.Dropout(dropouts))
             getattr(self,'{}_tower_dnn'.format(task_name)).add_module('{}_tower_laset_layer'.format(task_name),
                                                                             nn.Linear(tower_hidden_dim[-1], output_size))
-            getattr(self, '{}_tower_dnn'.format(task_name)).add_module('{}_tower_sigmoid'.format(task_name),nn.Sigmoid())
+            getattr(self, '{}_tower_dnn'.format(i + 1)).add_module('{}_tower_sigmoid'.format(task_name),nn.Sigmoid())
+            
+        # epnet
+        setattr(self,'epnet', nn.ModuleList())
+        epnet_hidden_dim = [emb_dim] + hidden_dim
+        for j in range(len(epnet_hidden_dim)-1):
+            getattr(self, 'epnet').add_module('epnet_hidden_{}'.format(j),
+                                                                            nn.Linear(epnet_hidden_dim[j], epnet_hidden_dim[j+1]))
+            getattr(self, 'epnet').add_module('epnet_batchnorm_{}'.format(j),
+                                                                            nn.BatchNorm1d(epnet_hidden_dim[j+1]))
+            getattr(self, 'epnet').add_module('epnet_dropout_{}'.format(j),nn.Dropout(dropouts))
+        getattr(self, 'epnet').add_module('epnet_laset_layer', nn.Linear(epnet_hidden_dim[-1], self.num_features))
+
 
 
     def forward(self, x):
         assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
         # embedding
         user_embed_list, item_embed_list = list(), list()
+        scene_embed_list = list()
         for user_feature, num in self.user_feature_dict.items():
-            if num[0] > 1:
-                user_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
+            if user_feature != 'tab':
+                if num[0] > 1:
+                    user_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
+                else:
+                    user_embed_list.append(x[:, num[1]].unsqueeze(1))
             else:
-                user_embed_list.append(x[:, num[1]].unsqueeze(1))
-            if user_feature == 'tab':
-                scene_feature = x[:, num[1]].long() # 场景特征
+                scene_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
+                scene_feature = x[:, num[1]].long()
         for item_feature, num in self.item_feature_dict.items():
             if num[0] > 1:
                 item_embed_list.append(getattr(self, item_feature)(x[:, num[1]].long()))
@@ -142,12 +154,37 @@ class PLE(nn.Module):
                 item_embed_list.append(x[:, num[1]].unsqueeze(1))
 
         # embedding 融合
-        user_embed = torch.cat(user_embed_list, axis=1)
-        item_embed = torch.cat(item_embed_list, axis=1)
+        # user_embed = torch.stack(user_embed_list, axis=1)
+        # print(f'user_embed: {user_embed.shape}')
+        user_embed_copy = torch.stack(user_embed_list, axis=1).detach() # batch * num_features* embedding_size 并且停止梯度
+        user_embed_copy = torch.sum(user_embed_copy, dim=1) # batch * embedding_size
+
+        # item_embed = torch.stack(item_embed_list, axis=1)
+        # print(f'item_embed: {item_embed.shape}')
+        item_embed_copy = torch.stack(item_embed_list, axis=1).detach() # batch * num_features* embedding_size 并且停止梯度
+        item_embed_copy = torch.sum(item_embed_copy, dim=1)
+
+        scene_embed = torch.cat(scene_embed_list, axis=1)
+
+        total_embed = user_embed_list+item_embed_list+scene_embed_list
+        hidden_input = torch.stack(total_embed, axis=1).float()  # batch * num_features* embedding_size
+        # print(f'hidden_input: {hidden_input.size()}')
+        
+        # epnet input
+        epnet_input = torch.stack([user_embed_copy, item_embed_copy, scene_embed], axis=1)  # batch * 3* embedding_size
+        epnet_input = torch.sum(epnet_input, dim=1)  # batch * embedding_size
+        # print(f'epnet_input: {epnet_input.size()}')
+        for epnet_layer in getattr(self,'epnet'):
+            epnet_input = epnet_layer(epnet_input)
+        epnet_gate = nn.Sigmoid()(epnet_input)*2
+        epnet_gate = epnet_gate.unsqueeze(2)
+        # print(f'epnet_gate: {epnet_gate.size()}')
+        hidden = hidden_input * epnet_gate
+        hidden = hidden.view(-1,self.hidden_size)
+        # print(f'hidden: {hidden.size()}')
 
         # hidden layer
-        hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size
-        #print(hidden.size())
+        # hidden = torch.cat([user_embed, item_embed,scene_embed], axis=1).float()  # batch * hidden_size
         
         # shared-expert
         share_experts = list()
@@ -169,8 +206,8 @@ class PLE(nn.Module):
         gates_out = list()
         for task in range(self.num_task):
             x = hidden
-            for nn in getattr(self, 'task_{}_gate'.format(task+1)):
-                x = nn(x)
+            for gate in getattr(self, 'task_{}_gate'.format(task+1)):
+                x = gate(x)
             gates_out.append(x)
 
         # 加权
@@ -190,7 +227,7 @@ class PLE(nn.Module):
             for mod in getattr(self, '{}_tower_dnn'.format(task_name)):
                 x = mod(x)
             task_outputs.append(x)
-        return task_outputs,scene_feature
+        return task_outputs, scene_feature
 
 
 

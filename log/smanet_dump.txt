@@ -1,0 +1,82 @@
+2025-02-11 22:14:31.775675: I tensorflow/core/util/port.cc:110] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-02-11 22:14:31.824995: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-02-11 22:14:32.627729: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+config_file: config/smanet_config.yaml
+seed: 100
+task_name: mtl
+mtl_task_num: 6
+dataset_path: data/KuaiRand/kuai.csv
+pretrain_path: 
+source_path: 
+target_path: 
+train_batch_size: 4096
+val_batch_size: 4096
+test_batch_size: 4096
+save_path: ./checkpoint/
+model_name: smanet
+epochs: 200
+lr: 0.0001
+num_heads: 4
+device: cpu
+is_parallel: False
+num_gpu: 1
+weight_decay: 0.0
+decay_step: 5
+gamma: 0.5
+k: 20
+metric_ratio: ['AUC', 'NDCG']
+hidden_size: 32
+block_num: 2
+num_groups: 4
+dropout: 0.3
+bert_mask_prob: 0.3
+factor_num: 128
+飞书通知发送成功
+Namespace(bert_mask_prob=0.3, block_num=2, config_file='config/smanet_config.yaml', dataset_path='data/KuaiRand/kuai.csv', decay_step=5, device='cpu', dropout=0.3, epochs=200, factor_num=128, gamma=0.5, hidden_size=32, is_parallel=False, k=20, lr=0.0001, metric_ratio=['AUC', 'NDCG'], model_name='smanet', mtl_task_num=6, num_gpu=1, num_groups=4, num_heads=4, pretrain_path='', save_path='./checkpoint/', seed=100, source_path='', target_path='', task_name='mtl', test_batch_size=4096, train_batch_size=4096, val_batch_size=4096, weight_decay=0.0)
+digit_columns: ['show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num', 'video_duration', 'long_time_play_user_num', 'short_time_play_user_num', 'play_progress', 'like_user_num', 'comment_user_num', 'comment_like_user_num'] to index
+  0%|          | 0/11 [00:00<?, ?it/s]  9%|▉         | 1/11 [00:00<00:02,  4.94it/s] 18%|█▊        | 2/11 [00:00<00:02,  3.72it/s] 27%|██▋       | 3/11 [00:00<00:01,  4.41it/s] 36%|███▋      | 4/11 [00:00<00:01,  4.27it/s] 45%|████▌     | 5/11 [00:01<00:01,  4.71it/s] 55%|█████▍    | 6/11 [00:01<00:00,  5.01it/s] 64%|██████▎   | 7/11 [00:01<00:00,  5.11it/s] 73%|███████▎  | 8/11 [00:01<00:00,  5.14it/s] 82%|████████▏ | 9/11 [00:01<00:00,  5.36it/s] 91%|█████████ | 10/11 [00:01<00:00,  5.66it/s]100%|██████████| 11/11 [00:02<00:00,  5.87it/s]100%|██████████| 11/11 [00:02<00:00,  5.12it/s]
+categorical_columns: ['user_id', 'video_id', 'tab', 'follow_user_num_range', 'fans_user_num_range', 'friend_user_num_range', 'register_days_range', 'author_id', 'video_type', 'video_duration', 'music_type', 'show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num', 'long_time_play_user_num', 'short_time_play_user_num', 'play_progress', 'like_user_num', 'comment_user_num', 'comment_like_user_num', 'month', 'day', 'hour'] to index
+  0%|          | 0/24 [00:00<?, ?it/s]  8%|▊         | 2/24 [00:00<00:02,  9.70it/s] 17%|█▋        | 4/24 [00:00<00:02,  7.71it/s] 21%|██        | 5/24 [00:00<00:02,  6.52it/s] 25%|██▌       | 6/24 [00:00<00:03,  5.99it/s] 29%|██▉       | 7/24 [00:01<00:02,  5.70it/s] 33%|███▎      | 8/24 [00:01<00:02,  6.03it/s] 38%|███▊      | 9/24 [00:01<00:02,  5.72it/s] 46%|████▌     | 11/24 [00:01<00:02,  5.88it/s] 54%|█████▍    | 13/24 [00:01<00:01,  7.82it/s] 62%|██████▎   | 15/24 [00:02<00:00,  9.45it/s] 71%|███████   | 17/24 [00:02<00:00, 10.89it/s] 79%|███████▉  | 19/24 [00:02<00:00, 11.97it/s] 88%|████████▊ | 21/24 [00:02<00:00, 12.36it/s] 96%|█████████▌| 23/24 [00:02<00:00,  7.64it/s]100%|██████████| 24/24 [00:03<00:00,  7.57it/s]
+0it [00:00, ?it/s]14it [00:00, 132.45it/s]30it [00:00, 169.53it/s]
+total train : 1102404 | total val : 137800 | total test : 137801
+total features : 24 | total user features : 6 | total item features : 18
+Epoch 1 training over ! time : 2025-02-11 22:21:12
+Epoch 1 train loss is 5.1977743, total scene, click auc is 0.5227308, like auc is 0.5025501, comment auc is 0.5132194, 5s auc is 0.5256940, 10s auc is 0.5223912, 18s auc is 0.5195498
+Epoch 1 train loss is 5.1977743, total scene, click ndcg is 0.5653701, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.7416702, 10s ndcg is 0.2844494, 18s ndcg is 0.2984900
+Epoch 1 val loss is 5.1540351, total scene, click auc is 0.5316816, like auc is 0.4999413, comment auc is 0.4792185, 5s auc is 0.5370607, 10s auc is 0.5291418, 18s auc is 0.5264177
+Epoch 1 val loss is 5.1540351, total scene, click ndcg is 0.4818809, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.4537426, 10s ndcg is 0.7471590, 18s ndcg is 0.3418190
+Epoch 1 val loss is 5.1977743, scene 1, click auc is 0.4964101, like auc is 0.5419269, comment auc is 0.6026075, 5s auc is 0.4925188, 10s auc is 0.4898040, 18s auc is 0.4917832
+Epoch 1 val loss is 5.1977743, scene 1, click ndcg is 0.4047201, like ndcg is 0.8322817, comment ndcg is 0.8365885, 5s ndcg is 0.3384794, 10s ndcg is 0.5628774, 18s ndcg is 0.4897850
+Epoch 1 val loss is 5.1977743, scene 2, click auc is 0.5063196, like auc is 0.5021243, comment auc is 0.4762005, 5s auc is 0.5052386, 10s auc is 0.5070484, 18s auc is 0.5102531
+Epoch 1 val loss is 5.1977743, scene 1, click ndcg is 0.4608954, like ndcg is 0.7908750, comment ndcg is 0.7935407, 5s ndcg is 0.4232903, 10s ndcg is 0.4475724, 18s ndcg is 0.5674469
+Epoch 1 val loss is 5.1977743, scene 2, click auc is 0.5025098, like auc is 0.5260190, comment auc is 0.4794940, 5s auc is 0.5045670, 10s auc is 0.5106121, 18s auc is 0.5042594
+Epoch 1 val loss is 5.1977743, scene 3, click ndcg is 0.4731431, like ndcg is 0.8407001, comment ndcg is 0.8298839, 5s ndcg is 0.4574865, 10s ndcg is 0.5422107, 18s ndcg is 0.5657726
+Epoch 1 val loss is 5.1977743, scene 4, click auc is 0.5094491, like auc is 0.4617901, comment auc is 0.4950880, 5s auc is 0.5060690, 10s auc is 0.5040298, 18s auc is 0.5040298
+Epoch 1 val loss is 5.1977743, scene 4, click ndcg is 0.4796555, like ndcg is 0.8102854, comment ndcg is 0.8320094, 5s ndcg is 0.4624236, 10s ndcg is 0.5246395, 18s ndcg is 0.5860878
+Epoch 2 training over ! time : 2025-02-11 22:27:08
+Epoch 2 train loss is 4.4577120, total scene, click auc is 0.5312570, like auc is 0.4955437, comment auc is 0.5104165, 5s auc is 0.5171795, 10s auc is 0.5309669, 18s auc is 0.5327458
+Epoch 2 train loss is 4.4577120, total scene, click ndcg is 0.7759944, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.4779671, 10s ndcg is 0.6442228, 18s ndcg is 0.4440973
+Epoch 2 val loss is 4.4519654, total scene, click auc is 0.5369963, like auc is 0.4836599, comment auc is 0.4748158, 5s auc is 0.5410146, 10s auc is 0.5370307, 18s auc is 0.5415336
+Epoch 2 val loss is 4.4519654, total scene, click ndcg is 0.3913818, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.4225750, 10s ndcg is 0.3531438, 18s ndcg is 0.1369847
+Epoch 2 val loss is 4.4577120, scene 1, click auc is 0.4960952, like auc is 0.4388283, comment auc is 0.4681680, 5s auc is 0.4929278, 10s auc is 0.5020689, 18s auc is 0.5102556
+Epoch 2 val loss is 4.4577120, scene 1, click ndcg is 0.0511203, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.0430325, 10s ndcg is 0.0135238, 18s ndcg is 0.0444505
+Epoch 2 val loss is 4.4577120, scene 2, click auc is 0.5052955, like auc is 0.4587003, comment auc is 0.4452620, 5s auc is 0.5054348, 10s auc is 0.5093097, 18s auc is 0.5179607
+Epoch 2 val loss is 4.4577120, scene 1, click ndcg is 0.0713830, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.1579564, 10s ndcg is 0.0271309, 18s ndcg is 0.0071014
+Epoch 2 val loss is 4.4577120, scene 2, click auc is 0.5071813, like auc is 0.4817932, comment auc is 0.4396131, 5s auc is 0.5040016, 10s auc is 0.5084894, 18s auc is 0.5161991
+Epoch 2 val loss is 4.4577120, scene 3, click ndcg is 0.0727508, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.2054304, 10s ndcg is 0.0293498, 18s ndcg is 0.0000000
+Epoch 2 val loss is 4.4577120, scene 4, click auc is 0.5092951, like auc is 0.4718417, comment auc is 0.5332007, 5s auc is 0.5080340, 10s auc is 0.5086579, 18s auc is 0.5086579
+Epoch 2 val loss is 4.4577120, scene 4, click ndcg is 0.0570230, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.1710108, 10s ndcg is 0.0313271, 18s ndcg is 0.0543699
+Epoch 3 training over ! time : 2025-02-11 22:33:05
+Epoch 3 train loss is 4.4507534, total scene, click auc is 0.5379694, like auc is 0.4900534, comment auc is 0.5039687, 5s auc is 0.5368037, 10s auc is 0.5378191, 18s auc is 0.5388569
+Epoch 3 train loss is 4.4507534, total scene, click ndcg is 0.6870165, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.5810820, 10s ndcg is 0.3746661, 18s ndcg is 0.3301376
+Epoch 3 val loss is 4.4521953, total scene, click auc is 0.5399240, like auc is 0.4895995, comment auc is 0.4827219, 5s auc is 0.5395440, 10s auc is 0.5363860, 18s auc is 0.5389825
+Epoch 3 val loss is 4.4521953, total scene, click ndcg is 0.6149519, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.3222722, 10s ndcg is 0.4351099, 18s ndcg is 0.3932784
+Epoch 3 val loss is 4.4507534, scene 1, click auc is 0.4929123, like auc is 0.4824002, comment auc is 0.4182855, 5s auc is 0.5047544, 10s auc is 0.4979748, 18s auc is 0.5115261
+Epoch 3 val loss is 4.4507534, scene 1, click ndcg is 0.0207762, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.0823440, 10s ndcg is 0.0033928, 18s ndcg is 0.0257737
+Epoch 3 val loss is 4.4507534, scene 2, click auc is 0.5099237, like auc is 0.4674986, comment auc is 0.4659070, 5s auc is 0.5056464, 10s auc is 0.5102216, 18s auc is 0.5167182
+Epoch 3 val loss is 4.4507534, scene 1, click ndcg is 0.0169160, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.0832077, 10s ndcg is 0.0055922, 18s ndcg is 0.0329725
+Epoch 3 val loss is 4.4507534, scene 2, click auc is 0.5108902, like auc is 0.4403157, comment auc is 0.5209375, 5s auc is 0.5076577, 10s auc is 0.5160481, 18s auc is 0.5125707
+Epoch 3 val loss is 4.4507534, scene 3, click ndcg is 0.1078703, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.1796332, 10s ndcg is 0.0077502, 18s ndcg is 0.0218689
+Epoch 3 val loss is 4.4507534, scene 4, click auc is 0.5062725, like auc is 0.4657614, comment auc is 0.4237120, 5s auc is 0.5037130, 10s auc is 0.5054494, 18s auc is 0.5054494
+Epoch 3 val loss is 4.4507534, scene 4, click ndcg is 0.0248697, like ndcg is 0.0000000, comment ndcg is 0.0000000, 5s ndcg is 0.1273524, 10s ndcg is 0.0662037, 18s ndcg is 0.0000000

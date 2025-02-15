@@ -14,8 +14,60 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 from model.ctr.inputs import *
-
+import requests
+import json
 tqdm.pandas()
+def send_feishu_notification(webhook_url, title, content):
+    """
+    向飞书机器人发送消息
+    :param webhook_url: 飞书机器人的 Webhook 地址
+    :param title: 消息标题
+    :param content: 消息内容
+    """
+    # 根据 content 类型处理消息内容
+    if isinstance(content, dict):
+        content_lines = []
+        for key, value in content.items():
+            content_lines.append(f"{key}: {value}")
+        content_text = "\n".join(content_lines)
+    elif isinstance(content, str):
+        content_text = content
+    else:
+        print("不支持的内容类型，仅支持字符串或字典类型。")
+        return
+    # 构建消息体
+    message = {
+        "msg_type": "post",
+        "content": {
+            "post": {
+                "zh_cn": {
+                    "title": title,
+                    "content": [
+                        [
+                            {
+                                "tag": "text",
+                                "text": content_text
+                            }
+                        ]
+                    ]
+                }
+            }
+        }
+    }
+    # 设置请求头
+    headers = {
+        "Content-Type": "application/json"
+    }
+    try:
+        # 发送 POST 请求
+        response = requests.post(webhook_url, headers=headers, data=json.dumps(message))
+        # 检查响应状态码
+        if response.status_code == 200:
+            print("飞书通知发送成功")
+        else:
+            print(f"飞书通知发送失败，状态码: {response.status_code}, 响应内容: {response.text}")
+    except Exception as e:
+        print(f"发送飞书通知时出现异常: {e}")
 
 
 def scene_auc(y_pred, y_true, scene_feature, tag):
@@ -33,6 +85,40 @@ def scene_auc(y_pred, y_true, scene_feature, tag):
     auc = roc_auc_score(y_true[scene_idx],y_pred[scene_idx])
     return auc
 
+def dcg(y_true, y_score, k=10):
+    """
+    计算 DCG 得分
+    :param y_true: 真实相关性得分列表
+    :param y_score: 预测得分列表
+    :param k: 推荐列表的长度
+    :return: DCG 得分
+    """
+    order = np.argsort(y_score)[::-1]
+    y_true = np.take(y_true, order[:k])
+    gains = 2 ** y_true - 1
+    discounts = np.log2(np.arange(len(y_true)) + 2)
+    return np.sum(gains / discounts)
+
+def ndcg(y_true, y_score, k=10):
+    """
+    计算 NDCG 得分
+    :param y_true: 真实相关性得分列表
+    :param y_score: 预测得分列表
+    :param k: 推荐列表的长度
+    :return: NDCG 得分
+    """
+    best_dcg = dcg(y_true, y_true, k)
+    if best_dcg == 0:
+        return 0
+    return dcg(y_true, y_score, k) / best_dcg
+
+def scene_ndcg(y_true, y_score, scene_feature, tag, k=10):
+    scene_idx = np.where(scene_feature == tag)[0]
+    y_hat = y_score[scene_idx]
+    y = y_true[scene_idx]
+    score = ndcg(y, y_hat)
+    return score
+
 def select_sampler(train_data, val_data, test_data, user_count, item_count, args):
     if args.sample == 'random':
         return RandomNegativeSampler(train_data, val_data, test_data, user_count, item_count, args.negsample_size, args.seed, args.negsample_savefolder)
@@ -42,37 +128,45 @@ def select_sampler(train_data, val_data, test_data, user_count, item_count, args
 def mtl_data(path=None, args=None):
     if not path:
         return
-    df = pd.read_csv(path, usecols=['user_id', 'video_id', 'is_click', 'is_like', 'is_follow', 'tab',
-                                    'is_5s', 'is_10s', 'is_18s', 'follow_user_num_range',
-                                    'fans_user_num_range', 'friend_user_num_range', 'author_id',
-                                    'video_type', 'music_type', 'show_user_num', 'play_user_num',
-                                    'complete_play_user_num', 'valid_play_user_num'])
+    # 更换数据源
+    df = pd.read_csv(path)
+    df.drop(columns = ['long_view','cancel_like_user_num'], inplace = True)
     # df = df[:100000]
     # df['video_category'] = df['video_category'].astype(str)
     df['follow_user_num_range'] = df['follow_user_num_range'].astype(str)
     df['fans_user_num_range'] = df['fans_user_num_range'].astype(str)
     df['friend_user_num_range'] = df['friend_user_num_range'].astype(str)
+    df['register_days_range'] = df['register_days_range'].astype(str)
     df['video_type'] = df['video_type'].astype(str)
+    df['music_type'] = df['music_type'].astype(str)
+    df['month'] = df['month'].astype(str)
+    df['day'] = df['day'].astype(str)
+    df['hour'] = df['hour'].astype(str)
     # df = sample_data(df)
     if args.mtl_task_num == 2:
         label_columns = ['click', 'like']
         categorical_columns = ["user_id", "item_id", "video_category", "gender", "age", "hist_1", "hist_2",
                        "hist_3", "hist_4", "hist_5", "hist_6", "hist_7", "hist_8", "hist_9", "hist_10"]
-    elif args.mtl_task_num == 1:
-        label_columns = ['click']
-        categorical_columns = ["user_id", "item_id", "video_category", "gender", "age", "hist_1", "hist_2",
-                               "hist_3", "hist_4", "hist_5", "hist_6", "hist_7", "hist_8", "hist_9", "hist_10"]
     else:
-        label_columns = ['is_click', 'is_like', 'is_follow','is_5s', 'is_10s', 'is_18s']
-        categorical_columns = ['user_id', 'video_id', 'follow_user_num_range','tab',
-                                    'fans_user_num_range', 'friend_user_num_range', 'author_id',
-                                    'video_type', 'music_type', 'show_user_num', 'play_user_num',
-                                    'complete_play_user_num', 'valid_play_user_num']
-    user_columns = ['user_id', 'video_id', 'author_id','tab']
-    digit_columns = ['show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num']
+        label_columns = ['is_click', 'is_like', 'is_comment','is_5s', 'is_10s', 'is_18s']
+        categorical_columns = ['user_id', 'video_id','tab', 'follow_user_num_range',
+                                'fans_user_num_range', 'friend_user_num_range', 'register_days_range',
+                                'author_id', 'video_type', 'video_duration', 'music_type',
+                                'show_user_num', 'play_user_num', 'complete_play_user_num',
+                                'valid_play_user_num', 'long_time_play_user_num',
+                                'short_time_play_user_num', 'play_progress', 'like_user_num',
+                                'comment_user_num', 'comment_like_user_num',
+                                'month', 'day', 'hour']
+    user_columns = ['user_id', 'fans_user_num_range', 'friend_user_num_range','follow_user_num_range',
+                    'register_days_range','tab']
+    digit_columns = ['show_user_num', 'play_user_num', 'complete_play_user_num', 'valid_play_user_num',
+                     'video_duration','long_time_play_user_num', 'short_time_play_user_num',
+                     'play_progress', 'like_user_num', 'comment_user_num', 'comment_like_user_num']
     print(f'digit_columns: {digit_columns} to index')
+    # 先对数值变量分桶
     for col in tqdm(digit_columns):
         df[col] = pd.qcut(df[col], q=5, labels=[1,2,3,4,5])
+    # 在对所有变量进行编码
     print(f'categorical_columns: {categorical_columns} to index')
     for col in tqdm(categorical_columns):
         le = LabelEncoder()
@@ -94,6 +188,8 @@ def mtl_data(path=None, args=None):
     tmp_df = df[train_len:]
     val_df = tmp_df[:int(len(tmp_df)/2)]
     test_df = tmp_df[int(len(tmp_df)/2):]
+    print(f'total train : {len(train_df)} | total val : {len(val_df)} | total test : {len(test_df)}')
+    print(f'total features : {len(categorical_columns)} | total user features : {len(user_feature_dict)} | total item features : {len(item_feature_dict)}')
     return train_df, val_df, test_df, user_feature_dict, item_feature_dict
 
 def set_fenbu(row_data):
