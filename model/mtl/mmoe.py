@@ -66,11 +66,15 @@ class MMOE(nn.Module):
         self.experts.data.normal_(0, 1)
         self.experts_bias = torch.nn.Parameter(torch.rand(mmoe_hidden_dim, n_expert), requires_grad=True)
         # gates
-        self.gates = [torch.nn.Parameter(torch.rand(hidden_size, n_expert), requires_grad=True) for _ in
-                      range(num_task)]
-        for gate in self.gates:
-            gate.data.normal_(0, 1)
-        self.gates_bias = [torch.nn.Parameter(torch.rand(n_expert), requires_grad=True) for _ in range(num_task)]
+        for task in range(num_task):
+            setattr(self, 'task_{}_gate'.format(task+1), nn.ModuleList())
+            getattr(self, 'task_{}_gate'.format(task+1)).add_module('linear',nn.Linear(hidden_size, n_expert, device=self.device))
+            getattr(self, 'task_{}_gate'.format(task+1)).add_module('softmax',nn.Softmax(dim=-1))
+        # self.gates = [torch.nn.Parameter(torch.rand(hidden_size, n_expert), requires_grad=True) for _ in
+        #               range(num_task)]
+        # for gate in self.gates:
+        #     gate.data.normal_(0, 1)
+        # self.gates_bias = [torch.nn.Parameter(torch.rand(n_expert), requires_grad=True) for _ in range(num_task)]
 
         for i in range(self.num_task):
             setattr(self, 'task_{}_dnn'.format(i + 1), nn.ModuleList())
@@ -84,6 +88,11 @@ class MMOE(nn.Module):
                                                                       nn.Dropout(dropouts[j]))
             getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('task_last_layer',
                                                                   nn.Linear(hid_dim[-1], output_size))
+            getattr(self, 'task_{}_dnn'.format(i + 1)).add_module('task_{}_sigmoid'.format(i + 1),nn.Sigmoid())
+
+    def forward(self, x):
+        assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
+        # embedding
 
     def forward(self, x):
         assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
@@ -117,14 +126,19 @@ class MMOE(nn.Module):
             experts_out = self.expert_activation(experts_out)
 
         gates_out = list()
-        for idx, gate in enumerate(self.gates):
-            gate = gate.to(self.device)
-            gate_out = torch.einsum('ab, bc -> ac', hidden, gate)  # batch * num_experts
-            if self.gates_bias:
-                self.gates_bias[idx] = self.gates_bias[idx].to(self.device)
-                gate_out += self.gates_bias[idx]
-            gate_out = nn.Softmax(dim=-1)(gate_out)
-            gates_out.append(gate_out)
+        for task in range(self.num_task):
+            x = hidden
+            for nn in getattr(self, 'task_{}_gate'.format(task+1)):
+                x = nn(x)
+            gates_out.append(x)
+        # for idx, gate in enumerate(self.gates):
+        #     gate = gate.to(self.device)
+        #     gate_out = torch.einsum('ab, bc -> ac', hidden, gate)  # batch * num_experts
+        #     if self.gates_bias:
+        #         self.gates_bias[idx] = self.gates_bias[idx].to(self.device)
+        #         gate_out += self.gates_bias[idx]
+        #     gate_out = nn.Softmax(dim=-1)(gate_out)
+        #     gates_out.append(gate_out)
 
         outs = list()
         for gate_output in gates_out:
@@ -141,4 +155,4 @@ class MMOE(nn.Module):
                 x = mod(x)
             task_outputs.append(x)
 
-        return task_outputs,scene_feature
+        return task_outputs, scene_feature
