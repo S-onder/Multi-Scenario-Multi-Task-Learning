@@ -30,7 +30,8 @@ from model.mtl.mmoe import MMOE
 from model.mtl.ple import PLE
 from model.mtl.pepnet import PEPNet
 from model.mtl.hinet import HiNet
-from model.mtl.SMANet import SMANet
+from model.mtl.sianet import SIANet
+from model.mtl.stem import STEM
 # from model.model_accelerate.stackrec import StackRec
 # from model.model_compression.cprec import CpRec
 # from model.inference_acceleration.skiprec import SkipRec, PolicyNetGumbel
@@ -571,8 +572,12 @@ if __name__ == "__main__":
             model = PLE(user_feature_dict, item_feature_dict,device=args.device)
         elif args.model_name == 'hinet':
             model = HiNet(user_feature_dict, item_feature_dict,device=args.device)
-        elif args.model_name == 'smanet':
-            model = SMANet(user_feature_dict, item_feature_dict, device=args.device, num_heads=args.num_heads)
+        elif args.model_name == 'sianet':
+            model = SIANet(user_feature_dict, item_feature_dict, device=args.device, num_heads=args.num_heads,
+                            subexpert_num=args.subexpert_num, hidden_dim=args.hidden_dim,
+                            subexpert_unit=args.subexpert_unit)
+        elif args.model_name == 'stem':
+            model = STEM(user_feature_dict, item_feature_dict,device=args.device)
         else:
             raise NotImplementedError
         
