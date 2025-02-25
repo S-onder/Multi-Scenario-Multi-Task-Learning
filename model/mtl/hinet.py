@@ -233,7 +233,6 @@ class HiNet(nn.Module):
 
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size(-1,1664)
-        print(hidden.size())
 
         # HiNet模型结构
         share_scene_expert, share_scene_gate = self.subexpert_integration(input=hidden, subexpert_unit=self.subexpert_unit)

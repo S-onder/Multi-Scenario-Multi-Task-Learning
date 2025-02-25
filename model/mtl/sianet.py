@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 class SubexpertIntegration(nn.Module):
-    def __init__(self, subexpert_unit, dropouts, subexpert_num=5, input_dim=None, init_scale=1.0):
+    def __init__(self, subexpert_unit, dropouts, subexpert_num=5, sideinfo_dim=512,input_dim=None, init_scale=1.0):
         """
         子MoE架构类
         
@@ -44,11 +44,11 @@ class SubexpertIntegration(nn.Module):
         
         # 定义门控网络
         self.gate_net = nn.Sequential(
-            nn.Linear(self.input_dim, self.subexpert_num),
+            nn.Linear(sideinfo_dim, self.subexpert_num),
             nn.Softmax(dim=1)
         )
 
-    def forward(self, input):
+    def forward(self, input, sideinfo):
         """
         前向传播
         
@@ -65,14 +65,14 @@ class SubexpertIntegration(nn.Module):
         out = torch.stack(out, dim=1)
         
         # 计算门控网络的输出
-        gate = self.gate_net(input)
+        gate = self.gate_net(sideinfo)
         
         # 将门控权重应用到子专家输出上，得到最终结果
         out = torch.sum(out * gate.unsqueeze(2), dim=1)
         
         return out
 
-class SMANet(nn.Module):
+class SIANet(nn.Module):
     """
     HiNet for CTCVR problem
     """
@@ -80,7 +80,8 @@ class SMANet(nn.Module):
     def __init__(self, user_feature_dict, item_feature_dict, emb_dim=128, 
                 task=['click', 'like', 'comment','_5s', '_10s', '_18s'], shared_expert=1,
                 hidden_dim=[128, 64], tower_dim = [64, 32], subexpert_unit = [512, 256], dropouts=0.3,
-                output_size=1, expert_activation=F.relu, device=None, num_heads = 4):
+                output_size=1, expert_activation=F.relu, device=None, num_heads = 4,
+                subexpert_num=5):
         """
         MMOE model input parameters
         :param user_feature_dict: user feature dict include: {feature_name: (feature_unique_num, feature_index)}
@@ -94,7 +95,7 @@ class SMANet(nn.Module):
         :param expert_activation: activation function like 'relu' or 'sigmoid'
         :param task: list of task name
         """
-        super(SMANet, self).__init__()
+        super(SIANet, self).__init__()
         # check input parameters
         if user_feature_dict is None or item_feature_dict is None:
             raise Exception("input parameter user_feature_dict and item_feature_dict must be not None")
@@ -111,12 +112,18 @@ class SMANet(nn.Module):
         self.subexpert_unit = subexpert_unit
         self.dropouts = dropouts
         self.num_heads = num_heads
-        self.SHARE_EXPERT = SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts, input_dim=3072, subexpert_num=5)
+        self.sideinfo_dim = 4*emb_dim
+        self.SHARE_EXPERT = SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts, 
+                                                 sideinfo_dim=self.sideinfo_dim, input_dim=3072, subexpert_num=subexpert_num)
         self.SCENE_EXPERT = {
-            0 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,input_dim=3072, subexpert_num=5),
-            1 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,input_dim=3072, subexpert_num=5),
-            2 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,input_dim=3072, subexpert_num=5),
-            3 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,input_dim=3072, subexpert_num=5)
+            0 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,
+                                     sideinfo_dim=self.sideinfo_dim, input_dim=3072, subexpert_num=subexpert_num),
+            1 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,
+                                     sideinfo_dim=self.sideinfo_dim, input_dim=3072, subexpert_num=subexpert_num),
+            2 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,
+                                     sideinfo_dim=self.sideinfo_dim, input_dim=3072, subexpert_num=subexpert_num),
+            3 : SubexpertIntegration(subexpert_unit=self.subexpert_unit, dropouts = self.dropouts,
+                                     sideinfo_dim=self.sideinfo_dim, input_dim=3072, subexpert_num=subexpert_num)
         }
         # n_expert = len(task)
         if device:
@@ -144,7 +151,7 @@ class SMANet(nn.Module):
         # hidden_size_1 = emb_dim * (user_cate_feature_nums + item_cate_feature_nums) + \
         #               (len(self.user_feature_dict) - user_cate_feature_nums) + (
         #                       len(self.item_feature_dict) - item_cate_feature_nums)
-        hidden_size = 2 * subexpert_unit[-1] # shared+scene+SAN
+        hidden_size = 3 * subexpert_unit[-1] # shared+scene+SAN
 
         # shared-expert
         # input_dim = embedding_dim
@@ -209,10 +216,29 @@ class SMANet(nn.Module):
                     other_expert = torch.mean(other_expert, dim=0)
                     kl_loss += F.kl_div(F.log_softmax(expert, dim=-1), F.softmax(other_expert, dim=-1), reduction='batchmean')
         return -1*kl_loss
+    
+    def SIA(self, expert_dict, num_heads):
+        """
+        计算场景expert之间的交叉注意力
+        """
+        # 从字典中取出来所有的expert
+        # 并且进行平均池化
+        scene_1_expert = expert_dict[0].mean(dim=0, keepdim=True) #（1, 256）
+        scene_2_expert = expert_dict[1].mean(dim=0, keepdim=True) #（1, 256）
+        scene_3_expert = expert_dict[2].mean(dim=0, keepdim=True) #（1, 256）
+        scene_4_expert = expert_dict[3].mean(dim=0, keepdim=True) #（1, 256）
+        # 拼接成序列
+        scene_all_expert= torch.cat([scene_1_expert, scene_2_expert, scene_3_expert, scene_4_expert], dim=0) #（4, 256）
+        mha = nn.MultiheadAttention(embed_dim=256, num_heads=num_heads, batch_first=True)
+        output, _ = mha(scene_all_expert, scene_all_expert, scene_all_expert)
+        out = output.squeeze(0) #（4, 256）
+        return out
+
     def forward(self, x):
         assert x.size()[1] == len(self.item_feature_dict) + len(self.user_feature_dict)
         # embedding
         user_embed_list, item_embed_list = list(), list()
+        sideinfo_list = list()
         for idx, (user_feature, num) in enumerate(self.user_feature_dict.items()):
             if num[0] > 1:
                 user_embed_list.append(getattr(self, user_feature)(x[:, num[1]].long()))
@@ -220,53 +246,81 @@ class SMANet(nn.Module):
                 user_embed_list.append(x[:, num[1]].unsqueeze(1))
             if user_feature == 'tab':
                 scene_feature = x[:, num[1]].long() # 场景特征
-                scene_emb = getattr(self, user_feature)(x[:, num[1]].long())
+                scene_emb = getattr(self, user_feature)(x[:, num[1]].long()).detach() #（1, 256）
                 # scene_gate_input = scene_emb.clone().detach()
+                sideinfo_list.append(scene_emb)
+            if user_feature == 'user_id':
+                userID_emb = getattr(self, user_feature)(x[:, num[1]].long()).detach()
+                sideinfo_list.append(userID_emb)
         for item_feature, num in self.item_feature_dict.items():
             if num[0] > 1:
                 item_embed_list.append(getattr(self, item_feature)(x[:, num[1]].long()))
             else:
                 item_embed_list.append(x[:, num[1]].unsqueeze(1))
-
+            if item_feature == 'video_id' or item_feature == 'author_id':
+                sideinfo_list.append(getattr(self, item_feature)(x[:, num[1]].long()).detach())
         # embedding 融合
         user_embed = torch.cat(user_embed_list, axis=1)
         item_embed = torch.cat(item_embed_list, axis=1)
+        sideinfo_embed = torch.cat(sideinfo_list, axis=1) #无梯度
 
         # hidden layer
         hidden = torch.cat([user_embed, item_embed], axis=1).float()  # batch * hidden_size(-1,1664)
 
         # 新架构
-        share_scene_expert = self.SHARE_EXPERT(hidden) # share_scene_expert (B,E)
+        share_scene_expert = self.SHARE_EXPERT(hidden, sideinfo_embed) # share_scene_expert (B,E)
         unique_scenes = torch.unique(scene_feature) # 场景index（去重）
         # debug
         # if len(unique_scenes) != 4:
         #     print('There are not 4 scenes')
+
         # 将 input 数据按场景划分
         scene_grouped_inputs = {}
         for scene in unique_scenes:
             indices = (scene_feature == scene).nonzero(as_tuple=True)[0]
             scene_grouped_inputs[scene.item()] = hidden[indices]
-            # print(f'scene:{scene},scene_grouped_inputs:{scene_grouped_inputs[scene.item()].size()}')
+
+        # 将 sideinfo 按场景划分    
+        scene_sideinfo_dict = {}
+        for scene in unique_scenes:
+            indices = (scene_feature == scene).nonzero(as_tuple=True)[0]
+            scene_sideinfo_dict[scene.item()] = sideinfo_embed[indices]
+
         # 循环创建当前batch下个场景的expert
         scene_outputs = {}
         for scene,scene_input in scene_grouped_inputs.items():
-            scene_outputs[scene] = self.SCENE_EXPERT[scene](scene_input)
-            # print(f'scene:{scene},scene_outputs:{scene_outputs[scene].size()}')
+            scene_sideinfo = scene_sideinfo_dict[scene]
+            scene_outputs[scene] = self.SCENE_EXPERT[scene](scene_input, scene_sideinfo)
+
+        # 注意力机制
+        scene_atten_outs = {}
+        atten_outputs = self.SIA(scene_outputs,self.num_heads)
+        for scene, scene_expert in scene_outputs.items():
+            n_sample, hidden_size = scene_expert.size()
+            scene_atten_out = atten_outputs[scene,:].repeat(n_sample,1)
+            scene_atten_outs[scene]= scene_atten_out
+
+        # 拼接
+        scene_merge_outs = {key: torch.cat([scene_outputs[key], scene_atten_outs[key]], dim = 1) for key in scene_outputs}
+
+
+        # KL loss
         kl_loss = self.KL_loss(scene_outputs)
         
         # 准备一个空张量来存储最终拼接的结果
-        _, scene_out_dim = scene_outputs[0].size() #取出来某一个场景的输出维度
+        _, scene_out_dim = scene_merge_outs[0].size() #取出来某一个场景的输出维度
         final_output = torch.zeros(hidden.size(0), scene_out_dim) 
         for scene, data in scene_grouped_inputs.items():
             # 获取该场景在原始数据中的索引
             indices = (scene_feature == scene).nonzero(as_tuple=True)[0]
             # 将该场景的输出放到 final_output 的对应位置
-            final_output[indices] = scene_outputs[scene]
+            final_output[indices] = scene_merge_outs[scene]
+        
         # 对场景进行gate加权
-        scene_gate = self.scene_gate_nn(scene_emb)*2 #类似于一个权重 epnet
-
+        # scene_gate = self.scene_gate_nn(scene_emb)*2 #类似于一个权重 epnet
         hinet_output = torch.cat((share_scene_expert, final_output), dim=1)
-        hinet_output = torch.mul(hinet_output, scene_gate)
+        # hinet_output = torch.mul(hinet_output, scene_gate)
+
         # shared-expert
         share_experts = list()
         for i in range(self.shared_expert):
